@@ -58,7 +58,7 @@
 
 	// Create title element
 	let title = document.createElement("h1");
-	title.innerText = "Chess Crawler";
+	title.innerText = "Chess Hacker";
 	title.style.width="80%";
 	title.style.height="100%";
 	title.style.background = "#302f2d";
