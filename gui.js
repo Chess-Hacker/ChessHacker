@@ -220,7 +220,7 @@
 	// Start at 50% fill (you can adjust as needed)
 	barFill.style.height = "50%";
 	barFill.style.background = "white";
-	barFill.style.transition = "height 0.3s ease";
+	barFill.style.transition = "height 1s ease-in-out";
 
 	// Append barFill inside barBackground
 	barBackground.appendChild(barFill);
@@ -302,6 +302,8 @@
 	rowDiv.style.alignItems = "center";
 	rowDiv.style.justifyContent = "center";
 	rowDiv.innerText = `CONSTRAINTS`;
+	rowDiv.style.fontSize = "16px"; // Larger font
+	rowDiv.style.fontWeight = "bold"; // Bold text
 	rowsContainer.appendChild(rowDiv);
 	/// ROW 2-3-4-----------------------------------------------------------------
 	// === Create a single row for the mode checkboxes ===

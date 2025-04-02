@@ -166,8 +166,6 @@ def read_chessboard():
         print("❌ chessboard.txt not found.")
         return None, None, None, []
 
-white_on_bottom=True
-
 stockfish_path = "./stockfish/stockfish-windows-x86-64-avx2.exe"
 stockfish = stockfishapi.start_stockfish(stockfish_path)
 
@@ -209,14 +207,10 @@ while True:
     if Restart:
         moves=0
         WhoNext="white"
-        if board[0][0]=='r':
-            white_on_bottom = True
-        else:
-            white_on_bottom = False
-        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,white_on_bottom)
+        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,GuiCheckbox1)
     if didMove:
         stockfishapi.stop_current_command(stockfish)
-        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,white_on_bottom)
+        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,GuiCheckbox1)
         print(initial_fen)
         score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
         stockfishapi.set_position_fen(stockfish, initial_fen)
@@ -233,17 +227,17 @@ while True:
             print("Skill")
             stockfishapi.set_elo_rating(stockfish,Slider2)
             best_move = stockfishapi.get_depth_move(stockfish, 15)
-            puppet.show_best_move_sync(best_move,white_on_bottom,ColorSelector2)
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2)
         else:
             stockfishapi.reset_elo_rating(stockfish)
         if(DepthCheckBox==True):
             print("Depth")
             best_move = stockfishapi.get_depth_move(stockfish, Slider0)
-            puppet.show_best_move_sync(best_move,white_on_bottom,ColorSelector0)
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0)
         if(TimeCheckBox==True):
             print("timeCheck")
             best_move = stockfishapi.get_time_move(stockfish, Slider1)
-            puppet.show_best_move_sync(best_move,white_on_bottom,ColorSelector1)
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1)
         print(best_move)
 
 observer.stop()

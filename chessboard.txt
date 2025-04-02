@@ -1,11 +1,11 @@
 False
 black
-8
-r n b q k b n r
-. p . p . . p p
-p . . . p p . .
-. . p . . . . .
-. . . P P . . .
-. . N . . N P .
+36
+r n . . . . k r
+p p . . Q . . .
+. . . . B p . p
+. . . . . . . P
+. . . N . . . .
+. . N . . . . .
 P P P . . P . P
-R . B Q K B . R
+R . B . K . . .
