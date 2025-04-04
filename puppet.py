@@ -45,15 +45,14 @@ def parse_move_list(html_content):
     reg = r'<div data-node="\d+-(\d+)" class="node (white|black)-move main-line-ply">'
     matches = re.findall(reg, html_content)
     if len(matches) == 0:
-        return -1, 'black'
-    return int(matches[-1][0], 10), matches[-1][1]
+        return 0, 'black'
+    return 1+int(matches[-1][0], 10), matches[-1][1]
 
 async def track_moves():
     global _page, _running
 
     prev_total_moves = 0
-    cnt=0
-    prev_last_color = 'white'
+    prev_last_color = 'black'
     while _running:
         try:
             content = await _page.content()
@@ -63,13 +62,10 @@ async def track_moves():
             total_moves, last_move_color = parse_move_list(content)
 
             Moved = False
-            if total_moves > prev_total_moves:
+            if total_moves != prev_total_moves:
                 Moved = True
                 prev_total_moves = total_moves
                 prev_last_color = last_move_color
-
-            if total_moves ==0 :
-                prev_total_moves=-1
 
             if prev_last_color == 'black':
                 who_next = 'white'
@@ -82,11 +78,6 @@ async def track_moves():
                 f.write(f"{total_moves}\n")
                 for row in curr_board:
                     f.write(" ".join(row) + "\n")
-            if cnt>=2:
-                cnt=0
-                with open("gui.txt", "w") as f:
-                    pass
-            
 
         except Exception as e:
             print(f"❌ Error in track_moves: {e}")

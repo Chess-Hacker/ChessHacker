@@ -1,11 +1,11 @@
 False
-black
-36
-r n . . . . k r
-p p . . Q . . .
-. . . . B p . p
-. . . . . . . P
-. . . N . . . .
-. . N . . . . .
-P P P . . P . P
-R . B . K . . .
+white
+32
+R . B . . Q N R
+P P B . . P . .
+. K . p . . . .
+. . . . n . b P
+. q . . p . . .
+. . . . . . . .
+p p p n . . p p
+r . . k . b . r

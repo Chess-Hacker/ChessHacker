@@ -14,7 +14,7 @@ def run_puppet_in_thread():
 
 puppet_thread = threading.Thread(target=run_puppet_in_thread, daemon=True)
 puppet_thread.start()
-
+time.sleep(5)
 # === MASTER VARIABLES ===
 StartButton = False
 GuiCheckbox1 = True
@@ -27,12 +27,17 @@ Slider0 = 1
 ColorSelector1 = "#00FF00" 
 Slider1 = 1
 ColorSelector2 = "#0000FF" 
-Slider2 = 1200
+Slider2 = 1320
 Teacher = False
 NoBlunder = False
 Engine = True
+# === GAME STATE VARIABLES ===
+Didmove = False
+WhoNext = "White"
+Moves = 0
+Board = None
+appstart=0
 
-# === FUNCTION TO UPDATE VARIABLES ===
 def update_variables():
     global StartButton, GuiCheckbox1, GuiCheckbox2, TimeCheckBox, DepthCheckBox
     global SkillCheckBox, ColorSelector0, Slider0,ColorSelector1, Slider1,ColorSelector2, Slider2, Teacher, NoBlunder, Engine
@@ -131,11 +136,13 @@ def update_variables():
 
 # === FILE CHANGE LISTENER ===
 class FileChangeHandler(FileSystemEventHandler):
-	def on_modified(self, event):
-		if event.src_path.endswith("gui.txt"):
-			update_variables()
-
-
+    def on_modified(self, event):
+        # Use os.path.basename to get the file name from the full path
+        filename = os.path.basename(event.src_path)
+        if filename == "gui.txt":
+            update_variables()
+        if filename == "chessboard.txt":
+            update_chessboard()
 # === START MONITORING ===
 event_handler = FileChangeHandler()
 observer = Observer()
@@ -143,24 +150,26 @@ observer.schedule(event_handler, ".", recursive=False)
 observer.start()
 #---------------------------------------------------------------------------------------------------------------------
 
-def read_chessboard():
+def update_chessboard():
+    global Didmove,WhoNext,Moves,Board,appstart
     try:
         with open("chessboard.txt", "r") as f:
             lines = f.readlines()
-
         if not lines:
-            print("⚠️ chessboard.txt is empty.")
+            #print("⚠️ chessboard.txt is empty.")
             return None, None,None, []
 
         didMove_str = lines[0].strip()
-        didMove = (didMove_str == "True")
+        Didmove = (didMove_str == "True")
 
         WhoNext = lines[1].strip()
-        moves = int(lines[2].strip())
+        Moves = int(lines[2].strip())
 
-        board = [line.strip().split() for line in lines[3:]]
-
-        return didMove, WhoNext,moves ,board
+        Board = [line.strip().split() for line in lines[3:]]
+        if Didmove == True or (Moves==0 and appstart==0):
+            appstart=1
+            DoMove()
+        return Didmove, WhoNext,Moves ,Board
 
     except FileNotFoundError:
         print("❌ chessboard.txt not found.")
@@ -169,7 +178,7 @@ def read_chessboard():
 stockfish_path = "./stockfish/stockfish-windows-x86-64-avx2.exe"
 stockfish = stockfishapi.start_stockfish(stockfish_path)
 
-def isStartBoard(board):
+def isStartBoard(Board):
     expected = [
     ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
     ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
@@ -190,55 +199,50 @@ def isStartBoard(board):
     ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
     ['r', 'n', 'b', 'k', 'q', 'b', 'n', 'r']
     ]
-    if board == expected or board == expected2:
+    if Board == expected or Board == expected2:
         return True
     else:
         return False
 
 print("Master did setup!")
 
-time.sleep(1)
+def DoMove():
+    initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
+    score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
+    stockfishapi.set_position_fen(stockfish, initial_fen)
+
+    print(initial_fen)
+    print(score)
+    print(pv1,pv2,pv3)
+
+    future = asyncio.run_coroutine_threadsafe(
+        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3),
+        puppet._loop
+    )
+    future.result()
+
+    best_move = None
+    if(SkillCheckBox==True):
+        print("Skill")
+        stockfishapi.set_elo_rating(stockfish,Slider2)
+        best_move = stockfishapi.get_depth_move(stockfish, 15)
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2)
+    else:
+        stockfishapi.reset_elo_rating(stockfish)
+    if(DepthCheckBox==True):
+        print("Depth")
+        best_move = stockfishapi.get_depth_move(stockfish, Slider0)
+        print("didfirstmovee")
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0)
+    if(TimeCheckBox==True):
+        print("timeCheck")
+        best_move = stockfishapi.get_time_move(stockfish, Slider1)
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1)
+    print(best_move)
 
 while True:
-
+    
     time.sleep(0.25)
-    didMove,WhoNext,moves, board = read_chessboard()
-    Restart = isStartBoard(board)
-    if Restart:
-        moves=0
-        WhoNext="white"
-        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,GuiCheckbox1)
-    if didMove:
-        stockfishapi.stop_current_command(stockfish)
-        initial_fen = parserFEN.matrix_to_fen(board, moves, WhoNext,GuiCheckbox1)
-        print(initial_fen)
-        score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
-        stockfishapi.set_position_fen(stockfish, initial_fen)
-        print(score)
-        print(pv1,pv2,pv3)
-        future = asyncio.run_coroutine_threadsafe(
-            puppet.update_gui(initial_fen,board,score,mate_score,pv1,pv2,pv3),
-            puppet._loop
-        )
-        future.result()
-
-        best_move = ""
-        if(SkillCheckBox==True):
-            print("Skill")
-            stockfishapi.set_elo_rating(stockfish,Slider2)
-            best_move = stockfishapi.get_depth_move(stockfish, 15)
-            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2)
-        else:
-            stockfishapi.reset_elo_rating(stockfish)
-        if(DepthCheckBox==True):
-            print("Depth")
-            best_move = stockfishapi.get_depth_move(stockfish, Slider0)
-            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0)
-        if(TimeCheckBox==True):
-            print("timeCheck")
-            best_move = stockfishapi.get_time_move(stockfish, Slider1)
-            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1)
-        print(best_move)
 
 observer.stop()
 observer.join()
