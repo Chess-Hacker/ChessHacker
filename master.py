@@ -136,13 +136,29 @@ def update_variables():
 
 # === FILE CHANGE LISTENER ===
 class FileChangeHandler(FileSystemEventHandler):
-    def on_modified(self, event):
-        # Use os.path.basename to get the file name from the full path
-        filename = os.path.basename(event.src_path)
-        if filename == "gui.txt":
-            update_variables()
-        if filename == "chessboard.txt":
-            update_chessboard()
+	last_chessboard = ""
+
+	def on_modified(self, event):
+		self.process_event(event)
+
+	def on_created(self, event):
+		self.process_event(event)
+
+	def process_event(self, event):
+		if not event.is_directory:
+			filename = os.path.basename(event.src_path)
+			if filename == "gui.txt":
+				update_variables()
+			elif filename == "chessboard.txt":
+				try:
+					with open("chessboard.txt", "r") as f:
+						content = f.read()
+					if content != self.last_chessboard:
+						self.last_chessboard = content
+						update_chessboard()
+				except Exception as e:
+					print(f"Error reading chessboard.txt: {e}")
+
 # === START MONITORING ===
 event_handler = FileChangeHandler()
 observer = Observer()
@@ -164,7 +180,7 @@ def update_chessboard():
 
         WhoNext = lines[1].strip()
         Moves = int(lines[2].strip())
-
+        print(Moves)
         Board = [line.strip().split() for line in lines[3:]]
         if Didmove == True or (Moves==0 and appstart==0):
             appstart=1
@@ -241,7 +257,6 @@ def DoMove():
     print(best_move)
 
 while True:
-    
     time.sleep(0.25)
 
 observer.stop()
