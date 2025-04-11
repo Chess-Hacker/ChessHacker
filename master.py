@@ -4,10 +4,10 @@ import puppet
 import stockfishapi
 import parserFEN
 import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 import json
 import os
+import win32file
+import win32con
 
 def run_puppet_in_thread():
     asyncio.run(puppet.main())
@@ -33,7 +33,7 @@ NoBlunder = False
 Engine = True
 # === GAME STATE VARIABLES ===
 Didmove = False
-WhoNext = "White"
+WhoNext = "white"
 Moves = 0
 Board = None
 appstart=0
@@ -135,35 +135,29 @@ def update_variables():
             print(f"Error reading gui.txt: {e}")
 
 # === FILE CHANGE LISTENER ===
-class FileChangeHandler(FileSystemEventHandler):
-	last_chessboard = ""
+path_to_watch = "."
 
-	def on_modified(self, event):
-		self.process_event(event)
+last_contents = {
+    "gui.txt": None,
+    "chessboard.txt": None,
+}
 
-	def on_created(self, event):
-		self.process_event(event)
+hDir = win32file.CreateFile(
+    path_to_watch,
+    win32con.GENERIC_READ,
+    win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE | win32con.FILE_SHARE_DELETE,
+    None,
+    win32con.OPEN_EXISTING,
+    win32con.FILE_FLAG_BACKUP_SEMANTICS,
+    None
+)
 
-	def process_event(self, event):
-		if not event.is_directory:
-			filename = os.path.basename(event.src_path)
-			if filename == "gui.txt":
-				update_variables()
-			elif filename == "chessboard.txt":
-				try:
-					with open("chessboard.txt", "r") as f:
-						content = f.read()
-					if content != self.last_chessboard:
-						self.last_chessboard = content
-						update_chessboard()
-				except Exception as e:
-					print(f"Error reading chessboard.txt: {e}")
-
-# === START MONITORING ===
-event_handler = FileChangeHandler()
-observer = Observer()
-observer.schedule(event_handler, ".", recursive=False)
-observer.start()
+def read_file_contents(filepath):
+    try:
+        with open(filepath, "r") as f:
+            return f.read()
+    except Exception:
+        return None
 #---------------------------------------------------------------------------------------------------------------------
 
 def update_chessboard():
@@ -180,9 +174,9 @@ def update_chessboard():
 
         WhoNext = lines[1].strip()
         Moves = int(lines[2].strip())
-        print(Moves)
         Board = [line.strip().split() for line in lines[3:]]
-        if Didmove == True or (Moves==0 and appstart==0):
+
+        if (Didmove == True or (Moves==0 and appstart==0) ) and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2)):
             appstart=1
             DoMove()
         return Didmove, WhoNext,Moves ,Board
@@ -242,22 +236,44 @@ def DoMove():
         print("Skill")
         stockfishapi.set_elo_rating(stockfish,Slider2)
         best_move = stockfishapi.get_depth_move(stockfish, 15)
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2)
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2,1)
     else:
         stockfishapi.reset_elo_rating(stockfish)
     if(DepthCheckBox==True):
         print("Depth")
         best_move = stockfishapi.get_depth_move(stockfish, Slider0)
-        print("didfirstmovee")
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0)
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0,1)
     if(TimeCheckBox==True):
         print("timeCheck")
         best_move = stockfishapi.get_time_move(stockfish, Slider1)
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1)
+        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
     print(best_move)
 
 while True:
-    time.sleep(0.25)
+    results = win32file.ReadDirectoryChangesW(
+        hDir,
+        1024,
+        True,
+        win32con.FILE_NOTIFY_CHANGE_LAST_WRITE,
+        None,
+        None
+    )
 
-observer.stop()
-observer.join()
+    for action, file in results:
+        full_filename = os.path.join(path_to_watch, file)
+
+        if file in last_contents:
+            new_content = read_file_contents(full_filename)
+            if new_content is None:
+                continue
+
+            if new_content != last_contents[file]:
+                #print(f"🔄 Real content change in: {full_filename}")
+                last_contents[file] = new_content
+
+                if file == "gui.txt":
+                    update_variables()
+                elif file == "chessboard.txt":
+                    update_chessboard()
+    
+    time.sleep(0.25)

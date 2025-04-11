@@ -57,7 +57,6 @@ def get_stockfish_score(stockfish, depth, fen):
 		score = None
 		mate_score = None
 		pvs = []
-
 		while True:
 			line = stockfish.stdout.readline().strip()
 			

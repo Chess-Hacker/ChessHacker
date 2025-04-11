@@ -48,30 +48,50 @@ def parse_move_list(html_content):
         return 0, 'black'
     return 1+int(matches[-1][0], 10), matches[-1][1]
 
+def check_Board(Board):
+    cnt=0
+    K=0
+    k=0
+    for i in range (0,8,1):
+        for j in range(0,8,1):
+            if Board[i][j]=='.':
+                cnt+=1
+            if Board[i][j]=='k':
+                k=1
+            if Board[i][j]=='K':
+                K=1
+    if cnt==64:
+        return False
+    if K!=1 or k!=1:
+        return False
+    return True
+
 async def track_moves():
     global _page, _running
 
     prev_total_moves = 0
     prev_last_color = 'black'
+    prev_board = None
     while _running:
         try:
             content = await _page.content()
-
             curr_board = parse_chessboard(content)
-
             total_moves, last_move_color = parse_move_list(content)
 
             Moved = False
+            
             if total_moves != prev_total_moves:
                 Moved = True
                 prev_total_moves = total_moves
                 prev_last_color = last_move_color
+                CheckValidity = check_Board(curr_board)
+                if CheckValidity==False:
+                    Moved=False
 
             if prev_last_color == 'black':
                 who_next = 'white'
             else:
                 who_next = 'black'
-
             with open("chessboard.txt", "w") as f:
                 f.write(f"{Moved}\n")
                 f.write(f"{who_next}\n")
@@ -81,10 +101,9 @@ async def track_moves():
 
         except Exception as e:
             print(f"❌ Error in track_moves: {e}")
-        cnt=+1
         await asyncio.sleep(0.25)
 
-async def highlight_best_move(move, White_on_bottom,color):
+async def highlight_best_move(move, White_on_bottom,color,number):
     global _page
     if not _page:
         print("⚠️ No page reference yet. Can't highlight best move.")
@@ -119,14 +138,14 @@ async def highlight_best_move(move, White_on_bottom,color):
         highlight_js = f"""
         (function() {{
             // Clear old squares
-            let old = document.querySelectorAll('.fromSquare, .toSquare');
+            let old = document.querySelectorAll('.fromSquare{number}, .toSquare{number}');
             old.forEach(el => el.remove());
 
             // fromSquare
             let fromRow = {from_square[0]};
             let fromCol = {from_square[1]};
             let fromDiv = document.createElement('div');
-            fromDiv.classList.add('fromSquare');
+            fromDiv.classList.add('fromSquare{number}');
             fromDiv.style.position = 'absolute';
             fromDiv.style.top = (fromRow * 12.5) + '%';
             fromDiv.style.left = (fromCol * 12.5) + '%';
@@ -141,7 +160,7 @@ async def highlight_best_move(move, White_on_bottom,color):
             let toRow = {to_square[0]};
             let toCol = {to_square[1]};
             let toDiv = document.createElement('div');
-            toDiv.classList.add('toSquare');
+            toDiv.classList.add('toSquare{number}');
             toDiv.style.position = 'absolute';
             toDiv.style.top = (toRow * 12.5) + '%';
             toDiv.style.left = (toCol * 12.5) + '%';
@@ -159,7 +178,7 @@ async def highlight_best_move(move, White_on_bottom,color):
         print(f"Error highlighting best move: {e}")
 
 
-def show_best_move_sync(move,White_on_bottom,color):
+def show_best_move_sync(move,White_on_bottom,color,number):
     global _loop
     if not _loop:
         print("⚠️ No event loop available. Can't show best move.")
@@ -167,7 +186,7 @@ def show_best_move_sync(move,White_on_bottom,color):
 
     import asyncio
     try:
-        future = asyncio.run_coroutine_threadsafe(highlight_best_move(move,White_on_bottom,color), _loop)
+        future = asyncio.run_coroutine_threadsafe(highlight_best_move(move,White_on_bottom,color,number), _loop)
         future.result()
     except Exception as e:
         print(f"Error in show_best_move_sync: {e}")
