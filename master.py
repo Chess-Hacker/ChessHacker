@@ -176,7 +176,7 @@ def update_chessboard():
         Moves = int(lines[2].strip())
         Board = [line.strip().split() for line in lines[3:]]
 
-        if (Didmove == True or (Moves==0 and appstart==0) ) and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2)):
+        if (Didmove == True or (Moves==0 and appstart==0) ):# and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2))
             appstart=1
             DoMove()
         return Didmove, WhoNext,Moves ,Board
@@ -276,4 +276,4 @@ while True:
                 elif file == "chessboard.txt":
                     update_chessboard()
     
-    time.sleep(0.25)
+    time.sleep(0.2)

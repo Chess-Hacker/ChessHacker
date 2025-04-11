@@ -59,7 +59,7 @@ def get_stockfish_score(stockfish, depth, fen):
 		pvs = []
 		while True:
 			line = stockfish.stdout.readline().strip()
-			
+			print("Not getting bestmove in stockfish")
 			if "info depth" in line:
 				parts = line.split()
 

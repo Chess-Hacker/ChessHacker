@@ -77,10 +77,10 @@ async def track_moves():
             content = await _page.content()
             curr_board = parse_chessboard(content)
             total_moves, last_move_color = parse_move_list(content)
-
             Moved = False
             
             if total_moves != prev_total_moves:
+                await remove_move_sync(1)
                 Moved = True
                 prev_total_moves = total_moves
                 prev_last_color = last_move_color
@@ -101,7 +101,22 @@ async def track_moves():
 
         except Exception as e:
             print(f"❌ Error in track_moves: {e}")
-        await asyncio.sleep(0.25)
+        await asyncio.sleep(0.2)
+
+async def remove_move_sync(number):
+	global _page
+	try:
+		#print("REMOVE!")
+		Remove_js = f"""
+		(function() {{
+			let oldSvg = document.querySelector('.move-svg{number}');
+            if(oldSvg) oldSvg.remove();
+		}})();
+		"""
+		await _page.evaluate(Remove_js)
+	except Exception as e:
+		print(f"Error removing best move: {e}")
+
 
 async def highlight_best_move(move, White_on_bottom,color,number):
     global _page
@@ -137,41 +152,90 @@ async def highlight_best_move(move, White_on_bottom,color,number):
             return
         highlight_js = f"""
         (function() {{
-            // Clear old squares
-            let old = document.querySelectorAll('.fromSquare{number}, .toSquare{number}');
-            old.forEach(el => el.remove());
+            let oldSvg = document.querySelector('.move-svg{number}');
+            if(oldSvg) oldSvg.remove();
 
-            // fromSquare
+            let board = document.querySelector('.board');
+            if (!board) return;
+
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.classList.add('move-svg{number}');
+            svg.setAttribute("width", board.offsetWidth);
+            svg.setAttribute("height", board.offsetHeight);
+            svg.style.position = "absolute";
+            svg.style.top = "0";
+            svg.style.left = "0";
+            svg.style.pointerEvents = "none";
+            svg.style.opacity = "1";
+
+            let boardWidth = board.offsetWidth;
+            let boardHeight = board.offsetHeight;
+            let squareWidth = boardWidth / 8;
+            let squareHeight = boardHeight / 8;
+
             let fromRow = {from_square[0]};
             let fromCol = {from_square[1]};
-            let fromDiv = document.createElement('div');
-            fromDiv.classList.add('fromSquare{number}');
-            fromDiv.style.position = 'absolute';
-            fromDiv.style.top = (fromRow * 12.5) + '%';
-            fromDiv.style.left = (fromCol * 12.5) + '%';
-            fromDiv.style.width = '12.5%';
-            fromDiv.style.height = '12.5%';
-            fromDiv.style.cursor = "grab";
-            fromDiv.style.border = '4px solid {color}';
-            fromDiv.style.zIndex = 0;
-            document.querySelector('.board').appendChild(fromDiv);
+            let toRow   = {to_square[0]};
+            let toCol   = {to_square[1]};
 
-            // toSquare
-            let toRow = {to_square[0]};
-            let toCol = {to_square[1]};
-            let toDiv = document.createElement('div');
-            toDiv.classList.add('toSquare{number}');
-            toDiv.style.position = 'absolute';
-            toDiv.style.top = (toRow * 12.5) + '%';
-            toDiv.style.left = (toCol * 12.5) + '%';
-            toDiv.style.width = '12.5%';
-            toDiv.style.height = '12.5%';
-            toDiv.style.border = '4px solid {color}';
-            toDiv.style.zIndex = 0;
-            document.querySelector('.board').appendChild(toDiv);
+            let centerFromX = fromCol * squareWidth + squareWidth / 2;
+            let centerFromY = fromRow * squareHeight + squareHeight / 2;
+            let centerToX   = toCol * squareWidth + squareWidth / 2;
+            let centerToY   = toRow * squareHeight + squareHeight / 2;
 
+            let dx = centerToX - centerFromX;
+            let dy = centerToY - centerFromY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            let u_x = dx / dist;
+            let u_y = dy / dist;
+
+            let half = squareWidth / 2;
+            let t = half / Math.max(Math.abs(u_x), Math.abs(u_y));
+            let newFromX = centerFromX + t * u_x;
+            let newFromY = centerFromY + t * u_y;
+
+            // --- Source square rectangle (no z-index; stays under pieces)
+            let startRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            startRect.setAttribute("x", fromCol * squareWidth);
+            startRect.setAttribute("y", fromRow * squareHeight);
+            startRect.setAttribute("width", squareWidth);
+            startRect.setAttribute("height", squareHeight);
+            startRect.setAttribute("stroke", "{color}");
+            startRect.setAttribute("stroke-width", "3");
+            startRect.setAttribute("fill", "none");
+            startRect.style.pointerEvents = "none";
+            svg.appendChild(startRect);
+
+            // --- Group for higher z-index elements: line + destination circle
+            let group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            group.style.zIndex = "-1";  // This should visually push these above pieces
+            group.style.pointerEvents = "none";
+
+            let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", newFromX);
+            line.setAttribute("y1", newFromY);
+            line.setAttribute("x2", centerToX);
+            line.setAttribute("y2", centerToY);
+            line.setAttribute("stroke", "{color}");
+            line.setAttribute("stroke-width", "5");
+            line.style.pointerEvents = "none";
+            group.appendChild(line);
+
+            let destCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            destCircle.setAttribute("cx", centerToX);
+            destCircle.setAttribute("cy", centerToY);
+            destCircle.setAttribute("r", Math.min(squareWidth, squareHeight) / 7);
+            destCircle.setAttribute("stroke", "{color}");
+            destCircle.setAttribute("stroke-width", "3");
+            destCircle.setAttribute("fill", "{color}");
+            destCircle.style.pointerEvents = "none";
+            group.appendChild(destCircle);
+
+            svg.appendChild(group);
+            board.appendChild(svg);
         }})();
         """
+        
         await _page.evaluate(highlight_js)
 
     except Exception as e:
@@ -297,6 +361,7 @@ async def main():
     _loop = asyncio.get_running_loop()
     async with async_playwright() as p:
         browser = await p.chromium.launch(executable_path="chromium-1161/chrome-win/chrome.exe",headless=False)
+        context = await browser.new_context(viewport=None)
         _page = await browser.new_page()
 
         await _page.set_viewport_size({"width": 1920, "height": 950})
