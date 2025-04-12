@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import os
 
 def start_stockfish(stockfish_path):
     try:
