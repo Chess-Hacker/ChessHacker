@@ -9,13 +9,9 @@ import os
 import win32file
 import win32con
 
-def run_puppet_in_thread():
-    asyncio.run(puppet.main())
 
-puppet_thread = threading.Thread(target=run_puppet_in_thread, daemon=True)
-puppet_thread.start()
-time.sleep(5)
 # === MASTER VARIABLES ===
+_running=True
 StartButton = False
 GuiCheckbox1 = True
 GuiCheckbox2 = False
@@ -36,7 +32,6 @@ Didmove = False
 WhoNext = "white"
 Moves = 0
 Board = None
-appstart=0
 
 def update_variables():
     global StartButton, GuiCheckbox1, GuiCheckbox2, TimeCheckBox, DepthCheckBox
@@ -134,23 +129,6 @@ def update_variables():
         except Exception as e:
             print(f"Error reading gui.txt: {e}")
 
-# === FILE CHANGE LISTENER ===
-path_to_watch = "."
-
-last_contents = {
-    "gui.txt": None,
-    "chessboard.txt": None,
-}
-
-hDir = win32file.CreateFile(
-    path_to_watch,
-    win32con.GENERIC_READ,
-    win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE | win32con.FILE_SHARE_DELETE,
-    None,
-    win32con.OPEN_EXISTING,
-    win32con.FILE_FLAG_BACKUP_SEMANTICS,
-    None
-)
 
 def read_file_contents(filepath):
     try:
@@ -161,7 +139,7 @@ def read_file_contents(filepath):
 #---------------------------------------------------------------------------------------------------------------------
 
 def update_chessboard():
-    global Didmove,WhoNext,Moves,Board,appstart
+    global Didmove,WhoNext,Moves,Board,appstart,_running
     try:
         with open("chessboard.txt", "r") as f:
             lines = f.readlines()
@@ -170,14 +148,16 @@ def update_chessboard():
             return None, None,None, []
 
         didMove_str = lines[0].strip()
+        if didMove_str=="CLOSE":
+            _running=False
+            return None, None, None, []
         Didmove = (didMove_str == "True")
 
         WhoNext = lines[1].strip()
         Moves = int(lines[2].strip())
         Board = [line.strip().split() for line in lines[3:]]
 
-        if (Didmove == True or (Moves==0 and appstart==0) ):# and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2))
-            appstart=1
+        if (Didmove == True):# and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2))
             DoMove()
         return Didmove, WhoNext,Moves ,Board
 
@@ -214,10 +194,10 @@ def isStartBoard(Board):
     else:
         return False
 
-print("Master did setup!")
-
 def DoMove():
     initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
+    if initial_fen =="8/8/8/8/8/8/8/8 w - - 0 1":
+        return 0
     score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
     stockfishapi.set_position_fen(stockfish, initial_fen)
 
@@ -249,31 +229,62 @@ def DoMove():
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
     print(best_move)
 
-while True:
-    results = win32file.ReadDirectoryChangesW(
-        hDir,
-        1024,
-        True,
-        win32con.FILE_NOTIFY_CHANGE_LAST_WRITE,
+def main():
+
+    def run_puppet_in_thread():
+        asyncio.run(puppet.main())
+
+    puppet_thread = threading.Thread(target=run_puppet_in_thread, daemon=True)
+    puppet_thread.start()
+
+    # === FILE CHANGE LISTENER ===
+    path_to_watch = "."
+
+    last_contents = {
+        "gui.txt": None,
+        "chessboard.txt": None,
+    }
+
+    hDir = win32file.CreateFile(
+        path_to_watch,
+        win32con.GENERIC_READ,
+        win32con.FILE_SHARE_READ | win32con.FILE_SHARE_WRITE | win32con.FILE_SHARE_DELETE,
         None,
+        win32con.OPEN_EXISTING,
+        win32con.FILE_FLAG_BACKUP_SEMANTICS,
         None
     )
+    # ==== ----------------- ==== 
+    print("Master did setup!")
+    global _running
+    while _running:
+        results = win32file.ReadDirectoryChangesW(
+            hDir,
+            1024,
+            True,
+            win32con.FILE_NOTIFY_CHANGE_LAST_WRITE,
+            None,
+            None
+        )
 
-    for action, file in results:
-        full_filename = os.path.join(path_to_watch, file)
+        for action, file in results:
+            full_filename = os.path.join(path_to_watch, file)
 
-        if file in last_contents:
-            new_content = read_file_contents(full_filename)
-            if new_content is None:
-                continue
+            if file in last_contents:
+                new_content = read_file_contents(full_filename)
+                if new_content is None:
+                    continue
 
-            if new_content != last_contents[file]:
-                #print(f"🔄 Real content change in: {full_filename}")
-                last_contents[file] = new_content
+                if new_content != last_contents[file]:
+                    #print(f"🔄 Real content change in: {full_filename}")
+                    last_contents[file] = new_content
 
-                if file == "gui.txt":
-                    update_variables()
-                elif file == "chessboard.txt":
-                    update_chessboard()
-    
-    time.sleep(0.2)
+                    if file == "gui.txt":
+                        update_variables()
+                    elif file == "chessboard.txt":
+                        update_chessboard()
+        time.sleep(0.2)
+    _running=True
+
+if __name__ == "__main__":
+    main()

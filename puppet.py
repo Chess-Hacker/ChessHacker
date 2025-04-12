@@ -3,7 +3,9 @@ import re
 from playwright.async_api import async_playwright
 from playwright.async_api import Error
 import os
+import requests
 
+browser= None
 _page = None
 _loop = None
 _running = True 
@@ -74,6 +76,9 @@ async def track_moves():
     prev_board = None
     while _running:
         try:
+            if _page.is_closed():
+                handle_browser_close()
+            #browser.on("close", handle_browser_close)
             content = await _page.content()
             curr_board = parse_chessboard(content)
             total_moves, last_move_color = parse_move_list(content)
@@ -98,10 +103,10 @@ async def track_moves():
                 f.write(f"{total_moves}\n")
                 for row in curr_board:
                     f.write(" ".join(row) + "\n")
-
         except Exception as e:
-            print(f"❌ Error in track_moves: {e}")
+            print(f"❌{e}")
         await asyncio.sleep(0.2)
+    _running=True
 
 async def remove_move_sync(number):
 	global _page
@@ -275,7 +280,7 @@ async def _handle_navigation(frame, page):
             # Wait for the page to be stable
             await page.wait_for_load_state("domcontentloaded")
             # Then do a short delay if needed
-            await asyncio.sleep(1)  # optional: let the site do any final scripts
+            await asyncio.sleep(2)  # optional: let the site do any final scripts
             # Re-inject
             await inject_gui(page)
         except Exception as e:
@@ -353,9 +358,25 @@ async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv
     """
     await safe_evaluate(_page, script)
 
+def handle_browser_close():
+    global _running
+    print("Browser is closing. Sending signal to server...")
+    with open("chessboard.txt", "w") as f:
+        f.write(f"CLOSE\n")
+    with open("token.txt", "r") as f:
+        tokenlines = f.readlines()
+    token = tokenlines[0].strip()
+    response = requests.get("https://chess-demo.mihneaspiridon.workers.dev/",
+                headers={
+                    "Action": "Release",
+                    "Token": f"{token}"
+                })
+    print(response.status_code)
+    _running=False
+
 async def main():
 
-    global _page, _loop
+    global _page, _loop,browser
     from playwright.async_api import async_playwright
 
     _loop = asyncio.get_running_loop()
@@ -374,6 +395,7 @@ async def main():
         await inject_gui(_page)
 
         await track_moves()
+        browser.on("close", handle_browser_close)
 
 if __name__ == "__main__":
     import asyncio
