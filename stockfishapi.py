@@ -4,11 +4,15 @@ import os
 
 def start_stockfish(stockfish_path):
     try:
+        CREATE_NO_WINDOW = 0x08000000
+
         stockfish = subprocess.Popen(
             stockfish_path,
-            universal_newlines=True, 
+            universal_newlines=True,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            creationflags=CREATE_NO_WINDOW if sys.platform == "win32" else 0
         )
         return stockfish
     except Exception as e:
