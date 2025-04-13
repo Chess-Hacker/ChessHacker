@@ -45,7 +45,6 @@ def launch_client_Key():
 def launch_client_Demo():
 	selected_site = site_var.get()
 	selected_engine = engine_var.get()
-	selected_resolution = resolution_var.get()
 	user_input = text_input.get()
 	import master
 	master_thread = threading.Thread(target=master.main, daemon=True)
@@ -54,7 +53,7 @@ def launch_client_Demo():
 root = tk.Tk()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.title("Chess Hacker Launcher")
-root.geometry("620x480")
+root.geometry("620x440")
 root.resizable(False, False)
 root.config(bg="#f7f7f7")
 root.iconbitmap("Media/icon.ico")
@@ -83,28 +82,19 @@ engine_options = ["Stockfish"]#, "Lc0", "Komodo"
 engine_menu = ttk.Combobox(frame, textvariable=engine_var, values=engine_options, state="readonly", font=("Helvetica", 12), width=20)
 engine_menu.grid(row=2, column=1, pady=10)
 
-# Resolution selection
-resolution_var = tk.StringVar(value="1920x1080")
-resolution_label = tk.Label(frame, text="Select Resolution:", font=("Helvetica", 14), bg="#f7f7f7")
-resolution_label.grid(row=3, column=0, sticky="w", pady=5)
-
-resolution_options = ["1920x1080"]#, "1280x720", "3840x2160"
-resolution_menu = ttk.Combobox(frame, textvariable=resolution_var, values=resolution_options, state="readonly", font=("Helvetica", 12), width=20)
-resolution_menu.grid(row=3, column=1, pady=10)
-
 # Text input area
 text_label = tk.Label(frame, text="Enter key:", font=("Helvetica", 14), bg="#f7f7f7")
-text_label.grid(row=4, column=0, sticky="w", pady=5)
+text_label.grid(row=3, column=0, sticky="w", pady=5)
 
 text_input = tk.Entry(frame, font=("Helvetica", 12), width=22, bd=2, relief="solid")
-text_input.grid(row=4, column=1, pady=10)
+text_input.grid(row=3, column=1, pady=10)
 
 # Launch button
 launch_button = tk.Button(frame, text="Launch", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button.grid(row=5, column=0, columnspan=1, pady=20, padx=10)
+launch_button.grid(row=4, column=0, columnspan=1, pady=20, padx=10)
 launch_button.config(command=launch_client_Key)
 launch_button1 = tk.Button(frame, text="Demo", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button1.grid(row=5, column=1, columnspan=1, pady=20, padx=10)
+launch_button1.grid(row=4, column=1, columnspan=1, pady=20, padx=10)
 launch_button1.config(command=launch_client_Demo)
 
 # Footer

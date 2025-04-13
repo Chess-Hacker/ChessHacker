@@ -374,18 +374,25 @@ def handle_browser_close():
     print(response.status_code)
     _running=False
 
-async def main():
+def reset_globals():
+    global _page, _loop, _running, _on_gui_change_registered
+    _page = None
+    _loop = None
+    _running = True
+    _on_gui_change_registered = False
 
+async def main():
+    reset_globals()
     global _page, _loop,browser
     from playwright.async_api import async_playwright
 
     _loop = asyncio.get_running_loop()
     async with async_playwright() as p:
-        browser = await p.chromium.launch(executable_path="chromium-1161/chrome-win/chrome.exe",headless=False)
-        context = await browser.new_context(viewport=None)
-        _page = await browser.new_page()
+        browser = await p.chromium.launch(executable_path="chromium-1161/chrome-win/chrome.exe",headless=False, args=["--start-maximized"])
+        context = await browser.new_context(no_viewport=True)
+        _page = await browser.new_page(no_viewport=True)
 
-        await _page.set_viewport_size({"width": 1920, "height": 950})
+        #await _page.set_viewport_size({"width": 1920, "height": 950})
         
         await _page.goto("https://www.chess.com/play/computer")
         #await _page.wait_for_load_state("networkidle")

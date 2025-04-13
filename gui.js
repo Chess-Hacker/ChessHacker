@@ -34,10 +34,63 @@
 	guiDiv.style.fontFamily = "Arial, sans-serif";
 	guiDiv.style.zIndex = "999999";
 	guiDiv.style.margin = "0";
-	guiDiv.style.padding = "0";
-	guiDiv.style.overflowX = "hidden";
-	//guiDiv.style.boxSizing = "border-box";
+	guiDiv.style.overflowX = "auto";
+	//guiDiv.style.minWidth = "150px";
+	guiDiv.style.userSelect = "none";
+	guiDiv.style.boxSizing = "border-box";
+
+	// Append guiDiv first
 	document.body.appendChild(guiDiv);
+
+	// Then create the resize handle
+	let resizeHandle = document.createElement("div");
+	resizeHandle.style.position = "fixed";
+
+	// Position it relative to guiDiv's position on screen
+	let rect = guiDiv.getBoundingClientRect();
+	resizeHandle.style.top = rect.top + "px";
+	resizeHandle.style.left = (rect.left - 5) + "px"; // 5px to the left
+	resizeHandle.style.width = "10px";
+	resizeHandle.style.height = rect.height + "px";
+	resizeHandle.style.cursor = "col-resize";
+	resizeHandle.style.backgroundColor = "#666"; // optional
+	resizeHandle.style.zIndex = "10000";
+
+	document.body.appendChild(resizeHandle);
+
+	// Keep it in sync if guiDiv moves/resizes
+	function updateResizeHandlePosition() {
+		const rect = guiDiv.getBoundingClientRect();
+		resizeHandle.style.top = rect.top + "px";
+		resizeHandle.style.left = (rect.left - 5) + "px";
+		resizeHandle.style.height = rect.height + "px";
+	}
+
+	// Drag logic
+	let isResizing = false;
+
+	resizeHandle.addEventListener("mousedown", (e) => {
+		isResizing = true;
+		document.body.style.cursor = "ew-resize";
+		e.preventDefault();
+		updateResizeHandlePosition();
+	});
+
+	document.addEventListener("mousemove", (e) => {
+		if (!isResizing) return;
+		let newWidth = window.innerWidth - e.clientX;
+		newWidth = Math.max(newWidth, 0); // minimum width
+		guiDiv.style.width = `${newWidth}px`;
+		updateResizeHandlePosition();
+	});
+
+	document.addEventListener("mouseup", () => {
+		if (isResizing) {
+			isResizing = false;
+			document.body.style.cursor = "default";
+		}
+		updateResizeHandlePosition();
+	});
 
 	// FIRST ROW  --------------------------------------------------------------------------------------------------
 	let headerRow = document.createElement("div");
@@ -45,26 +98,33 @@
 	headerRow.style.alignItems = "center";
 	headerRow.style.justifyContent = "flex-start";
 	headerRow.style.width = "100%";
-	headerRow.style.height = "7%";
+	headerRow.style.height = "10%";
+	headerRow.style.aspectRatio = "8 / 1"; // keeps it proportionate
+	headerRow.style.background = "#2A2926";
 
+	// Icon image
 	let iconImg = document.createElement("img");
 	let stringIcon = base64Images['I'];
 	iconImg.src = `data:image/png;base64,${stringIcon}`;
-	iconImg.style.width = "20%";
+	iconImg.style.width = "40%";
 	iconImg.style.height = "100%";
-	iconImg.style.alignItems = "center";
-	iconImg.style.justifyContent = "center";
-	iconImg.style.background = "#2A2926";
+	iconImg.style.objectFit = "contain"; // maintain aspect
+	iconImg.style.padding = "1%";
 
-	// Create title element
+	// Title
 	let title = document.createElement("h1");
 	title.innerText = "Chess Hacker";
-	title.style.width="80%";
-	title.style.height="100%";
-	title.style.background = "#2A2926";
+	title.style.margin = "0";
+	title.style.width = "80%";
+	title.style.height = "100%";
 	title.style.display = "flex";
 	title.style.alignItems = "center";
 	title.style.justifyContent = "center";
+	title.style.color = "white";
+	title.style.fontSize = "1.2vw"; // scales with screen width
+	title.style.fontWeight = "bold";
+	title.style.fontFamily = "Arial, sans-serif";
+	title.style.background = "#2A2926";
 
 	headerRow.appendChild(iconImg);
 	headerRow.appendChild(title);
@@ -539,7 +599,7 @@
 	chessboardDiv.style.display = "grid";
 	chessboardDiv.style.gridTemplateColumns = "repeat(8, 12.49%)";
 
-	chessboardDiv.style.width = "100%"; 
+	chessboardDiv.style.width = "50%"; 
 
 	chessboardDiv.style.position = "relative";
 	guiDiv.appendChild(chessboardDiv);
@@ -583,7 +643,7 @@
 				img.style.position = "absolute";
 				img.style.top = "0";
 				img.style.left = "0";
-				img.style.width = "100%";
+				img.style.width = "100%%";
 				img.style.height = "100%";
 				square.appendChild(img);
 			}

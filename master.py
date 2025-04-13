@@ -139,14 +139,14 @@ def read_file_contents(filepath):
 #---------------------------------------------------------------------------------------------------------------------
 
 def update_chessboard():
-    global Didmove,WhoNext,Moves,Board,appstart,_running
+    global Didmove,WhoNext,Moves,Board,appstart,_running,GuiCheckbox2,GuiCheckbox1
     try:
         with open("chessboard.txt", "r") as f:
             lines = f.readlines()
         if not lines:
             #print("⚠️ chessboard.txt is empty.")
             return None, None,None, []
-
+        print(f"{GuiCheckbox1} si {GuiCheckbox2}")
         didMove_str = lines[0].strip()
         if didMove_str=="CLOSE":
             _running=False
@@ -229,8 +229,33 @@ def DoMove():
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
     print(best_move)
 
+def reset():
+    global _running,StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,Teacher,NoBlunder,Engine,Didmove,WhoNext,Moves,Board
+    _running=True
+    StartButton = False
+    GuiCheckbox1 = True
+    GuiCheckbox2 = False
+    TimeCheckBox = False
+    DepthCheckBox = True
+    SkillCheckBox = False
+    ColorSelector0 = "#FF0000" 
+    Slider0 = 1 
+    ColorSelector1 = "#00FF00" 
+    Slider1 = 1
+    ColorSelector2 = "#0000FF" 
+    Slider2 = 1320
+    Teacher = False
+    NoBlunder = False
+    Engine = True
+    # === GAME STATE VARIABLES ===
+    Didmove = False
+    WhoNext = "white"
+    Moves = 0
+    Board = None
+
 def main():
 
+    reset()
     def run_puppet_in_thread():
         asyncio.run(puppet.main())
 
