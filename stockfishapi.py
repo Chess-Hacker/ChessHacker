@@ -44,15 +44,18 @@ def set_position_fen(stockfish, fen):
         print(f"Error setting FEN: {e}")
 
 def stop_current_command(stockfish):
-    try:
-        stockfish.stdin.write("stop\n")
-        stockfish.stdin.flush()
-        print("Stopped stockfish")
-    except Exception as e:
-        print(f"Error stopping current command: {e}")
+	try:
+		stockfish.stdin.write("stop\n")
+		stockfish.stdin.flush()
+		print("Stopped stockfish")
+	except Exception as e:
+		print(f"Error stopping current command: {e}")
 
 def get_stockfish_score(stockfish, depth, fen):
 	try:
+		stockfish.stdin.write(f"setoption name MultiPV value 3\n")
+		stockfish.stdin.flush()
+
 		stockfish.stdin.write(f"position fen {fen}\n")
 		stockfish.stdin.flush()
 
@@ -99,6 +102,9 @@ def get_stockfish_score(stockfish, depth, fen):
 
 		if mate_score is None and score is not None:
 			mate_score = "none"
+
+		stockfish.stdin.write("setoption name MultiPV value 1\n")
+		stockfish.stdin.flush()
 
 		return score, mate_score, pvs[0], pvs[1], pvs[2]
 
