@@ -146,7 +146,6 @@ def update_chessboard():
         if not lines:
             #print("⚠️ chessboard.txt is empty.")
             return None, None,None, []
-        print(f"{GuiCheckbox1} si {GuiCheckbox2}")
         didMove_str = lines[0].strip()
         if didMove_str=="CLOSE":
             _running=False
@@ -158,6 +157,8 @@ def update_chessboard():
         Board = [line.strip().split() for line in lines[3:]]
 
         if (Didmove == True):# and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2))
+            for i in range(0,8,1):
+                print(Board[i])
             DoMove()
         return Didmove, WhoNext,Moves ,Board
 
@@ -201,9 +202,9 @@ def DoMove():
     score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
     stockfishapi.set_position_fen(stockfish, initial_fen)
 
-    print(initial_fen)
-    print(score)
-    print(pv1,pv2,pv3)
+    #print(initial_fen)
+    #print(score)
+    #print(pv1,pv2,pv3)
 
     future = asyncio.run_coroutine_threadsafe(
         puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3),
@@ -213,21 +214,21 @@ def DoMove():
 
     best_move = None
     if(SkillCheckBox==True):
-        print("Skill")
+        #print("Skill")
         stockfishapi.set_elo_rating(stockfish,Slider2)
         best_move = stockfishapi.get_depth_move(stockfish, 15)
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2,1)
     else:
         stockfishapi.reset_elo_rating(stockfish)
     if(DepthCheckBox==True):
-        print("Depth")
+        #print("Depth")
         best_move = stockfishapi.get_depth_move(stockfish, Slider0)
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0,1)
     if(TimeCheckBox==True):
-        print("timeCheck")
+        #print("timeCheck")
         best_move = stockfishapi.get_time_move(stockfish, Slider1)
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
-    print(best_move)
+    #print(best_move)
 
 def reset():
     global _running,StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,Teacher,NoBlunder,Engine,Didmove,WhoNext,Moves,Board
@@ -285,9 +286,9 @@ def main():
     while _running:
         results = win32file.ReadDirectoryChangesW(
             hDir,
-            1024,
-            True,
-            win32con.FILE_NOTIFY_CHANGE_LAST_WRITE,
+            32768*2,
+            False,
+            win32con.FILE_NOTIFY_CHANGE_SIZE,
             None,
             None
         )
@@ -301,12 +302,12 @@ def main():
                     continue
 
                 if new_content != last_contents[file]:
-                    #print(f"🔄 Real content change in: {full_filename}")
                     last_contents[file] = new_content
 
                     if file == "gui.txt":
                         update_variables()
                     elif file == "chessboard.txt":
+                        #time.sleep(0.05)
                         update_chessboard()
         time.sleep(0.2)
     _running=True
