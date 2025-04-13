@@ -156,9 +156,12 @@ def update_chessboard():
         Moves = int(lines[2].strip())
         Board = [line.strip().split() for line in lines[3:]]
 
-        if (Didmove == True):# and ((WhoNext=="white" and GuiCheckbox1) or (WhoNext=="black" and GuiCheckbox2))
-            for i in range(0,8,1):
-                print(Board[i])
+        if (Didmove == True):
+            #RESET CASTLING DACA TREBUIE
+            Restart = isStartBoard(Board)
+            if Restart:
+                parserFEN.ResetCastling()
+
             DoMove()
         return Didmove, WhoNext,Moves ,Board
 
@@ -255,8 +258,10 @@ def reset():
     Board = None
 
 def main():
-
+    
+    parserFEN.ResetCastling()
     reset()
+
     def run_puppet_in_thread():
         asyncio.run(puppet.main())
 

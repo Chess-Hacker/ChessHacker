@@ -1,3 +1,10 @@
+Castling=[True,True,True,True,True,True,True]
+#         K    k    RK   RQ   rk   rq
+
+def ResetCastling():
+	for i in range(0,7,1):
+		Castling[i]=True
+
 def matrix_to_fen(chessboard, moves, WhoNext, white_on_bottom, last_move=None):
 
 	if not white_on_bottom:
@@ -41,16 +48,30 @@ def matrix_to_fen(chessboard, moves, WhoNext, white_on_bottom, last_move=None):
 def get_castling_rights(chessboard, turn):
 	rights = ""
 
+	if chessboard[7][7] != 'R':
+		Castling[2]=False
+	if chessboard[7][0] != 'R':
+		Castling[3]=False
+	if chessboard[7][4] != 'K':
+		Castling[0]=False
+	if chessboard[0][7] != 'r':
+		Castling[4]=False
+	if chessboard[0][0] != 'r':
+		Castling[5]=False
+	if chessboard[0][4] != 'k':
+		Castling[1]=False
+	
+
 	if chessboard[7][4] == 'K' and not is_king_attacked(chessboard, "w"):
-		if chessboard[7][7] == 'R':
+		if chessboard[7][7] == 'R' and Castling[0] and Castling[2]:
 			rights += 'K'
-		if chessboard[7][0] == 'R':
+		if chessboard[7][0] == 'R' and Castling[0] and Castling[3]:
 			rights += 'Q'
 
 	if chessboard[0][4] == 'k' and not is_king_attacked(chessboard, "b"):
-		if chessboard[0][7] == 'r':
+		if chessboard[0][7] == 'r' and Castling[1] and Castling[4]:
 			rights += 'k'
-		if chessboard[0][0] == 'r':
+		if chessboard[0][0] == 'r' and Castling[1] and Castling[5]:
 			rights += 'q'
 
 	return rights if rights else "-"
