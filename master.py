@@ -77,7 +77,6 @@ def update_variables():
                         TimeCheckBox = bool(value)
                         DepthCheckBox = False
                         SkillCheckBox = False
-                        print("TIME CHECKED!")
 
                     elif id_name == "DepthCheckBox":
                         DepthCheckBox = bool(value)

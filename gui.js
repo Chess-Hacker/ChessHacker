@@ -253,11 +253,11 @@
 	let contentContainer = document.createElement("div");
 	contentContainer.style.display = "flex";
 	contentContainer.style.width = "100%";
-	contentContainer.style.height = "55%";
+	contentContainer.style.height = "61.85%";
 	contentContainer.style.alignItems = "stretch";
 
 	let barColumn = document.createElement("div");
-	barColumn.style.width = "20%"; 
+	barColumn.style.width = "10%"; 
 	barColumn.style.height = "100%"; 
 	barColumn.style.display = "flex";
 	barColumn.style.alignItems = "center";
@@ -347,7 +347,7 @@
 	};
 	/// ADD THE 7 ROWS----------------------------------------------------------------------------------------------------------
 	let rowsContainer = document.createElement("div");
-	rowsContainer.style.width = "80%";
+	rowsContainer.style.width = "90%";
 	rowsContainer.style.height = "100%";
 	rowsContainer.style.display = "flex";
 	rowsContainer.style.flexDirection = "column";
@@ -356,12 +356,12 @@
 	/// ROW 1-----------------------------------------------------------------
 	let rowDiv = document.createElement("div");
 	rowDiv.style.width = "100%"; 
-	rowDiv.style.height = "7%";
+	rowDiv.style.height = "10%";
 	rowDiv.style.background = "#2A2926";
 	rowDiv.style.display = "flex";
 	rowDiv.style.alignItems = "center";
 	rowDiv.style.justifyContent = "center";
-	rowDiv.innerText = `Settings & Information`;
+	rowDiv.innerText = `MOVE SETTINGS`;
 	rowDiv.style.fontSize = "16px"; // Larger font
 	rowDiv.style.fontWeight = "bold"; // Bold text
 	rowsContainer.appendChild(rowDiv);
@@ -438,7 +438,7 @@
 	for (let i = 0; i < 3; i++) {
 		let pvRow = document.createElement("div");
 		pvRow.style.width = "100%";
-		pvRow.style.height = "7%";
+		pvRow.style.height = "8%";
 		pvRow.style.display = "flex";
 		pvRow.style.alignItems = "center";
 		pvRow.style.justifyContent = "center";
@@ -488,7 +488,7 @@
 		row.style.alignItems = "center";
 		row.style.justifyContent = "space-between";
 		row.style.width = "100%";
-		row.style.height = "7%";
+		row.style.height = "8%";
 		if(i==1)
 			row.style.background = "#2A2926";
 		else
@@ -570,7 +570,7 @@
 	rowDiv1.style.display = "flex";
 	rowDiv1.style.alignItems = "center";
 	rowDiv1.style.justifyContent = "center";
-	rowDiv1.innerText = `Display Settings`;
+	rowDiv1.innerText = `DISPLAY SETTINGS`;
 	rowDiv1.style.fontSize = "16px"; // Larger font
 	rowDiv1.style.fontWeight = "bold"; // Bold text
 	rowsContainer.appendChild(rowDiv1);
@@ -581,7 +581,7 @@
 		row.style.alignItems = "center";
 		row.style.justifyContent = "space-between";
 		row.style.width = "100%";
-		row.style.height = "7%";
+		row.style.height = "8%";
 		if(i==1)
 			row.style.background = "#2A2926";
 		else
@@ -623,7 +623,7 @@
 	/// HELP BUTTON -----------------------------------------------------------------------------------
 	let rowDiv2 = document.createElement("div");
 	rowDiv2.style.width = "100%";
-	rowDiv2.style.height = "10%";
+	rowDiv2.style.height = "8%";
 	rowDiv2.style.background = "#2A2926";
 	rowDiv2.style.display = "flex";
 	rowDiv2.style.alignItems = "center";
@@ -640,7 +640,6 @@
 	helpLink.style.alignItems = "center";
 	helpLink.style.gap = "8px";
 	helpLink.style.fontSize = "16px";
-	helpLink.style.fontWeight = "bold";
 	helpLink.style.transition = "color 0.2s ease";
 
 	// Arrow icon box
@@ -648,7 +647,6 @@
 	iconBox.innerText = "↗";
 	iconBox.style.width = "20px";
 	iconBox.style.height = "20px";
-	iconBox.style.float  = "left";
 	iconBox.style.display = "flex";
 	iconBox.style.alignItems = "center";
 	iconBox.style.justifyContent = "center";
@@ -659,27 +657,21 @@
 
 	// Help text
 	let helpText = document.createElement("span");
-	helpText.innerText = "Help";
+	helpText.innerText = "Quick Guide";
 
 	// Hover and click styling
 	helpLink.addEventListener("mouseenter", () => {
-		helpLink.style.color = "#FFD700";
+		helpLink.style.color = "#1a73e8";
 		iconBox.style.background = "#4A4946";
 	});
 	helpLink.addEventListener("mouseleave", () => {
 		helpLink.style.color = "white";
 		iconBox.style.background = "#3A3936";
 	});
-	helpLink.addEventListener("mousedown", () => {
-		helpLink.style.color = "#FFB000";
-	});
-	helpLink.addEventListener("mouseup", () => {
-		helpLink.style.color = "#FFD700";
-	});
 
 	// Append parts
-	helpLink.appendChild(iconBox);
 	helpLink.appendChild(helpText);
+	helpLink.appendChild(iconBox);
 	rowDiv2.appendChild(helpLink);
 	rowsContainer.appendChild(rowDiv2);
 
@@ -692,7 +684,7 @@
 	// FEN Display ----------------------------------------------------------------------------------------------------------
 	let fenDisplay = document.createElement("div");
 	fenDisplay.style.width = "100%"; 
-	fenDisplay.style.height = "7%";
+	fenDisplay.style.height = "5%";
 	fenDisplay.style.background = "#2A2926";
 	fenDisplay.style.display = "";
 	fenDisplay.style.alignItems = "center";
@@ -714,22 +706,31 @@
 	fenDisplay.appendChild(FENTextArea);
 	guiDiv.appendChild(fenDisplay);
 	
+	// Create a main container that holds both the chessboard and the info panel side by side
+	let mainContainer = document.createElement("div");
+	mainContainer.style.display = "flex";
+	mainContainer.style.width = "100%";
+	mainContainer.style.height = "16%";
+	mainContainer.style.boxSizing = "border-box";
+	guiDiv.appendChild(mainContainer);
 
-    // Chessboard container --------------------------------------------------------------------------------------------------
-    let chessboardDiv = document.createElement("div");
+	// ====================
+	// Chessboard Section
+	// ====================
+	let chessboardDiv = document.createElement("div");
 	chessboardDiv.id = "chessboard";
 	chessboardDiv.style.display = "grid";
 	chessboardDiv.style.gridTemplateColumns = "repeat(8, 12.49%)";
-
-	chessboardDiv.style.width = "50%"; 
-
+	chessboardDiv.style.width = "50%";  // Occupies 50% of the mainContainer
+	chessboardDiv.style.height = "100%";
 	chessboardDiv.style.position = "relative";
-	guiDiv.appendChild(chessboardDiv);
+	mainContainer.appendChild(chessboardDiv);
 
+	// Create chessboard squares (8x8 grid)
 	for (let i = 0; i < 64; i++) {
 		let square = document.createElement("div");
 		square.style.width = "100%";
-		square.style.paddingBottom = "100%"; 
+		square.style.paddingBottom = "100%"; // Creates a square using padding
 		square.style.position = "relative";
 		square.style.display = "flex";
 		square.style.justifyContent = "center";
@@ -748,27 +749,97 @@
 		chessboardDiv.appendChild(square);
 	}
 
+	// This function updates the chessboard with the pieces (assumes you have base64Images available)
 	window.updateChessboardFromMatrix = function(matrix) {
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				let square = document.getElementById("square" + (i * 8 + j));
-
 				square.innerHTML = "";
 				let piece = matrix[i][j];
 				if (piece === ".") continue;
 				let base64String = base64Images[piece];
 				if (!base64String) continue;
 				let img = document.createElement("img");
-
 				img.src = `data:image/png;base64,${base64String}`;
-
 				img.style.position = "absolute";
 				img.style.top = "0";
 				img.style.left = "0";
-				img.style.width = "100%%";
+				img.style.width = "100%";
 				img.style.height = "100%";
 				square.appendChild(img);
 			}
 		}
 	}
+
+	// ====================
+	// Info Panel Section
+	// ====================
+	let infoContainer = document.createElement("div");
+	infoContainer.id = "infoContainer";
+	infoContainer.style.width = "50%";  // Occupies the right half of mainContainer
+	infoContainer.style.height = "100%";
+	infoContainer.style.display = "flex";
+	infoContainer.style.flexDirection = "column";
+	infoContainer.style.justifyContent = "space-evenly";  // Distribute 3 divs evenly
+	infoContainer.style.boxSizing = "border-box";
+	mainContainer.appendChild(infoContainer);
+
+	// Info Div 1: Last Move Display
+	let lastMoveDiv = document.createElement("div");
+	lastMoveDiv.id = "lastMoveDiv";
+	lastMoveDiv.style.height="33.33%";
+	lastMoveDiv.style.display = "flex";
+	lastMoveDiv.style.alignItems = "center";
+	lastMoveDiv.style.justifyContent = "center";
+	lastMoveDiv.style.background = "#2A2926";
+	lastMoveDiv.style.color = "white";
+	lastMoveDiv.style.fontSize = "16px";
+	lastMoveDiv.innerText = "Last Move: [move]";
+	infoContainer.appendChild(lastMoveDiv);
+
+	// Info Div 2: Move Type Display
+	let moveTypeDiv = document.createElement("div");
+	moveTypeDiv.id = "moveTypeDiv";
+	moveTypeDiv.style.height="33.33%";
+	moveTypeDiv.style.display = "flex";
+	moveTypeDiv.style.alignItems = "center";
+	moveTypeDiv.style.justifyContent = "center";
+	moveTypeDiv.style.background = "#2A2926";
+	moveTypeDiv.style.color = "white";
+	moveTypeDiv.style.fontSize = "16px";
+	moveTypeDiv.innerText = "Move Type:";
+	infoContainer.appendChild(moveTypeDiv);
+
+	// Info Div 3: Composite Score Div (Half image, half score)
+	let scoreDiv = document.createElement("div");
+	scoreDiv.id = "scoreDiv";
+	scoreDiv.style.height="33.33%";
+	scoreDiv.style.display = "flex";
+	scoreDiv.style.background = "#2A2926";
+	scoreDiv.style.boxSizing = "border-box";
+
+	// Left half for an image
+	let scoreImageDiv = document.createElement("div");
+	scoreImageDiv.id = "scoreImageDiv";
+	scoreImageDiv.style.flex = "1";
+	scoreImageDiv.style.display = "flex";
+	scoreImageDiv.style.alignItems = "center";
+	scoreImageDiv.style.justifyContent = "center";
+	scoreImageDiv.style.borderRight = "1px solid #444"; // Optional divider
+	scoreImageDiv.innerText = "Img";  // Placeholder; later replace with an <img> element if needed
+	scoreDiv.appendChild(scoreImageDiv);
+
+	// Right half for the score text
+	let scoreTextDiv = document.createElement("div");
+	scoreTextDiv.id = "scoreTextDiv";
+	scoreTextDiv.style.flex = "1";
+	scoreTextDiv.style.display = "flex";
+	scoreTextDiv.style.alignItems = "center";
+	scoreTextDiv.style.justifyContent = "center";
+	scoreTextDiv.style.fontSize = "16px";
+	scoreTextDiv.innerText = "+0.2";  // Placeholder score
+	scoreDiv.appendChild(scoreTextDiv);
+
+	infoContainer.appendChild(scoreDiv);
+
 })();
