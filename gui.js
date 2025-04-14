@@ -253,7 +253,7 @@
 	let contentContainer = document.createElement("div");
 	contentContainer.style.display = "flex";
 	contentContainer.style.width = "100%";
-	contentContainer.style.height = "35%";
+	contentContainer.style.height = "55%";
 	contentContainer.style.alignItems = "stretch";
 
 	let barColumn = document.createElement("div");
@@ -356,12 +356,12 @@
 	/// ROW 1-----------------------------------------------------------------
 	let rowDiv = document.createElement("div");
 	rowDiv.style.width = "100%"; 
-	rowDiv.style.height = "14%";
+	rowDiv.style.height = "7%";
 	rowDiv.style.background = "#2A2926";
 	rowDiv.style.display = "flex";
 	rowDiv.style.alignItems = "center";
 	rowDiv.style.justifyContent = "center";
-	rowDiv.innerText = `CONSTRAINTS`;
+	rowDiv.innerText = `Settings & Information`;
 	rowDiv.style.fontSize = "16px"; // Larger font
 	rowDiv.style.fontWeight = "bold"; // Bold text
 	rowsContainer.appendChild(rowDiv);
@@ -370,7 +370,7 @@
 	let modeRow = document.createElement("div");
 	modeRow.style.display = "flex";
 	modeRow.style.width = "100%";
-	modeRow.style.height = "14%";
+	modeRow.style.height = "8%";
 	modeRow.style.justifyContent = "space-around";
 	modeRow.style.alignItems = "center";
 	modeRow.style.background = "#262522";
@@ -438,7 +438,7 @@
 	for (let i = 0; i < 3; i++) {
 		let pvRow = document.createElement("div");
 		pvRow.style.width = "100%";
-		pvRow.style.height = "40px";
+		pvRow.style.height = "7%";
 		pvRow.style.display = "flex";
 		pvRow.style.alignItems = "center";
 		pvRow.style.justifyContent = "center";
@@ -488,7 +488,7 @@
 		row.style.alignItems = "center";
 		row.style.justifyContent = "space-between";
 		row.style.width = "100%";
-		row.style.height = "40px";
+		row.style.height = "7%";
 		if(i==1)
 			row.style.background = "#2A2926";
 		else
@@ -562,6 +562,128 @@
 			});
 		});
 	}
+	// ROW 8-9-10-11 To display more settings and help ------------------------------------------------------------------------
+	let rowDiv1 = document.createElement("div");
+	rowDiv1.style.width = "100%"; 
+	rowDiv1.style.height = "10%";
+	rowDiv1.style.background = "#2A2926";
+	rowDiv1.style.display = "flex";
+	rowDiv1.style.alignItems = "center";
+	rowDiv1.style.justifyContent = "center";
+	rowDiv1.innerText = `Display Settings`;
+	rowDiv1.style.fontSize = "16px"; // Larger font
+	rowDiv1.style.fontWeight = "bold"; // Bold text
+	rowsContainer.appendChild(rowDiv1);
+
+	for (let i = 0; i < 2; i++) {
+		let row = document.createElement("div");
+		row.style.display = "flex";
+		row.style.alignItems = "center";
+		row.style.justifyContent = "space-between";
+		row.style.width = "100%";
+		row.style.height = "7%";
+		if(i==1)
+			row.style.background = "#2A2926";
+		else
+			row.style.background = "#262522";
+		row.style.padding = "5px";
+
+		let label1 = document.createElement("label");
+		let item1 = document.createElement("input");
+		
+		label1.style.display = "flex";
+		label1.style.width = "100%";
+		label1.style.height = "3.9%";
+		if(i==0 || i==2)
+			label1.style.background = "#262522";
+		else
+			label1.style.background = "#2A2926";
+		label1.style.alignItems = "center";
+		label1.style.justifyContent = "center";
+		
+		if (i === 1) {
+			label1.appendChild(document.createTextNode("Show Blunders"));
+			item1.id = "NoBlunder";
+		} else if (i === 0) {
+			label1.appendChild(document.createTextNode("Show Engine Moves"));
+			item1.id = "Teacher";
+		}
+		
+		item1.type = "checkbox";
+		item1.classList.add("settingsCheckbox");
+	
+		if (i === 0) {
+			item1.checked = true;
+		}
+		
+		label1.appendChild(item1);
+		row.appendChild(label1);
+		rowsContainer.appendChild(row);
+	}
+	/// HELP BUTTON -----------------------------------------------------------------------------------
+	let rowDiv2 = document.createElement("div");
+	rowDiv2.style.width = "100%";
+	rowDiv2.style.height = "10%";
+	rowDiv2.style.background = "#2A2926";
+	rowDiv2.style.display = "flex";
+	rowDiv2.style.alignItems = "center";
+	rowDiv2.style.justifyContent = "center";
+	rowDiv2.style.cursor = "pointer"; // Make it look clickable
+
+	// Create the <a> element
+	let helpLink = document.createElement("a");
+	helpLink.href = "https://your-help-link.com"; // 🔗 replace with your actual URL
+	helpLink.target = "_blank";
+	helpLink.style.textDecoration = "none";
+	helpLink.style.color = "white";
+	helpLink.style.display = "flex";
+	helpLink.style.alignItems = "center";
+	helpLink.style.gap = "8px";
+	helpLink.style.fontSize = "16px";
+	helpLink.style.fontWeight = "bold";
+	helpLink.style.transition = "color 0.2s ease";
+
+	// Arrow icon box
+	let iconBox = document.createElement("div");
+	iconBox.innerText = "↗";
+	iconBox.style.width = "20px";
+	iconBox.style.height = "20px";
+	iconBox.style.float  = "left";
+	iconBox.style.display = "flex";
+	iconBox.style.alignItems = "center";
+	iconBox.style.justifyContent = "center";
+	iconBox.style.background = "#3A3936";
+	iconBox.style.borderRadius = "4px";
+	iconBox.style.fontSize = "14px";
+	iconBox.style.color = "#ccc";
+
+	// Help text
+	let helpText = document.createElement("span");
+	helpText.innerText = "Help";
+
+	// Hover and click styling
+	helpLink.addEventListener("mouseenter", () => {
+		helpLink.style.color = "#FFD700";
+		iconBox.style.background = "#4A4946";
+	});
+	helpLink.addEventListener("mouseleave", () => {
+		helpLink.style.color = "white";
+		iconBox.style.background = "#3A3936";
+	});
+	helpLink.addEventListener("mousedown", () => {
+		helpLink.style.color = "#FFB000";
+	});
+	helpLink.addEventListener("mouseup", () => {
+		helpLink.style.color = "#FFD700";
+	});
+
+	// Append parts
+	helpLink.appendChild(iconBox);
+	helpLink.appendChild(helpText);
+	rowDiv2.appendChild(helpLink);
+	rowsContainer.appendChild(rowDiv2);
+
+
 	// ----------------------------------------------------------------------------------------------------------------------
 	contentContainer.appendChild(barColumn);
 	contentContainer.appendChild(rowsContainer);
@@ -570,7 +692,7 @@
 	// FEN Display ----------------------------------------------------------------------------------------------------------
 	let fenDisplay = document.createElement("div");
 	fenDisplay.style.width = "100%"; 
-	fenDisplay.style.height = "5%";
+	fenDisplay.style.height = "7%";
 	fenDisplay.style.background = "#2A2926";
 	fenDisplay.style.display = "";
 	fenDisplay.style.alignItems = "center";
@@ -648,72 +770,5 @@
 				square.appendChild(img);
 			}
 		}
-	}
-	/// TOTAL SETTINGS-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-	for (let i = 0; i < 3; i++) {
-		let label1 = document.createElement("label");
-		let item1 = document.createElement("input");
-		
-		label1.style.display = "flex";
-		label1.style.width = "100%";
-		label1.style.height = "3.9%";
-		if(i==0 || i==2)
-			label1.style.background = "#262522";
-		else
-			label1.style.background = "#2A2926";
-		label1.style.alignItems = "center";
-		label1.style.justifyContent = "center";
-		
-		if (i === 2) {
-			label1.appendChild(document.createTextNode("NoBlunder Settings"));
-			item1.id = "NoBlunder";
-		} else if (i === 1) {
-			label1.appendChild(document.createTextNode("Teacher Settings"));
-			item1.id = "Teacher";
-		} else if (i === 0) {
-			label1.appendChild(document.createTextNode("Engine Settings"));
-			item1.id = "Engine";
-		}
-		
-		item1.type = "checkbox";
-		item1.classList.add("settingsCheckbox");
-	
-		if (i === 0) {
-			item1.checked = true;
-		}
-		
-		item1.addEventListener("change", function() {
-			if (!this.checked) {
-				let siblings = document.querySelectorAll('.settingsCheckbox');
-				let anyChecked = false;
-				siblings.forEach(box => {
-					if (box.checked) {
-						anyChecked = true;
-					}
-				});
-				if (!anyChecked) {
-					document.getElementById("NoBlunder").checked = true;
-					window.onGuiChange({
-						id: "NoBlunder",
-						value: true
-					});
-					return;
-				}
-			} else {
-				let siblings = document.querySelectorAll('.settingsCheckbox');
-				siblings.forEach(box => {
-					if (box !== this) {
-						box.checked = false;
-					}
-				});
-			}
-			window.onGuiChange({
-				id: this.id,
-				value: this.checked
-			});
-		});
-		
-		label1.appendChild(item1);
-		guiDiv.appendChild(label1);
 	}
 })();

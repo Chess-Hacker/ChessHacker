@@ -53,7 +53,7 @@ def launch_client_Demo():
 root = tk.Tk()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.title("Chess Hacker Launcher")
-root.geometry("620x440")
+root.geometry("620x470")
 root.resizable(False, False)
 root.config(bg="#f7f7f7")
 root.iconbitmap("Media/icon.ico")
@@ -82,19 +82,28 @@ engine_options = ["Stockfish"]#, "Lc0", "Komodo"
 engine_menu = ttk.Combobox(frame, textvariable=engine_var, values=engine_options, state="readonly", font=("Helvetica", 12), width=20)
 engine_menu.grid(row=2, column=1, pady=10)
 
+#Browser selection
+browser_var = tk.StringVar(value="Chromium")
+browser_label = tk.Label(frame, text="Select Browser:", font=("Helvetica", 14), bg="#f7f7f7")
+browser_label.grid(row=3, column=0, sticky="w", pady=5)
+
+browser_options = ["Chromium"]#, "Lc0", "Komodo"
+browser_menu = ttk.Combobox(frame, textvariable=browser_var, values=browser_options, state="readonly", font=("Helvetica", 12), width=20)
+browser_menu.grid(row=3, column=1, pady=10)
+
 # Text input area
 text_label = tk.Label(frame, text="Enter key:", font=("Helvetica", 14), bg="#f7f7f7")
-text_label.grid(row=3, column=0, sticky="w", pady=5)
+text_label.grid(row=4, column=0, sticky="w", pady=5)
 
 text_input = tk.Entry(frame, font=("Helvetica", 12), width=22, bd=2, relief="solid")
-text_input.grid(row=3, column=1, pady=10)
+text_input.grid(row=4, column=1, pady=10)
 
 # Launch button
 launch_button = tk.Button(frame, text="Launch", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button.grid(row=4, column=0, columnspan=1, pady=20, padx=10)
+launch_button.grid(row=5, column=0, columnspan=1, pady=20, padx=10)
 launch_button.config(command=launch_client_Key)
 launch_button1 = tk.Button(frame, text="Demo", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button1.grid(row=4, column=1, columnspan=1, pady=20, padx=10)
+launch_button1.grid(row=5, column=1, columnspan=1, pady=20, padx=10)
 launch_button1.config(command=launch_client_Demo)
 
 # Footer
