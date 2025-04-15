@@ -706,23 +706,26 @@
 	fenDisplay.appendChild(FENTextArea);
 	guiDiv.appendChild(fenDisplay);
 	
-	// Create a main container that holds both the chessboard and the info panel side by side
+	// ====================================================
+	// Overall Container (GUI Div)
+	// ====================================================
+
 	let mainContainer = document.createElement("div");
 	mainContainer.style.display = "flex";
 	mainContainer.style.width = "100%";
-	mainContainer.style.height = "16%";
+	mainContainer.style.height = "172px";  // fixed chessboard height
 	mainContainer.style.boxSizing = "border-box";
 	guiDiv.appendChild(mainContainer);
 
-	// ====================
-	// Chessboard Section
-	// ====================
+	// --------------------
+	// Chessboard Section (Fixed Size)
+	// --------------------
 	let chessboardDiv = document.createElement("div");
 	chessboardDiv.id = "chessboard";
 	chessboardDiv.style.display = "grid";
-	chessboardDiv.style.gridTemplateColumns = "repeat(8, 12.49%)";
-	chessboardDiv.style.width = "50%";  // Occupies 50% of the mainContainer
-	chessboardDiv.style.height = "100%";
+	chessboardDiv.style.gridTemplateColumns = "repeat(8, 21.5px)"; // Adjusted for fixed dimensions
+	chessboardDiv.style.width = "172px";   // Fixed width (adjust as desired)
+	chessboardDiv.style.height = "172px";  // Fixed height (chessboard squares will scale accordingly)
 	chessboardDiv.style.position = "relative";
 	mainContainer.appendChild(chessboardDiv);
 
@@ -730,7 +733,7 @@
 	for (let i = 0; i < 64; i++) {
 		let square = document.createElement("div");
 		square.style.width = "100%";
-		square.style.paddingBottom = "100%"; // Creates a square using padding
+		square.style.paddingBottom = "100%"; // Creates a square shape using the padding-bottom trick
 		square.style.position = "relative";
 		square.style.display = "flex";
 		square.style.justifyContent = "center";
@@ -738,18 +741,16 @@
 		
 		let row = Math.floor(i / 8);
 		let col = i % 8;
-		
 		if (row % 2 === 0) {
 			square.style.backgroundColor = (col % 2 === 0) ? "#f0d9b5" : "#b58863";
 		} else {
 			square.style.backgroundColor = (col % 2 === 0) ? "#b58863" : "#f0d9b5";
 		}
-		
 		square.id = "square" + i;
 		chessboardDiv.appendChild(square);
 	}
 
-	// This function updates the chessboard with the pieces (assumes you have base64Images available)
+	// Function to update the chessboard with pieces (assumes base64Images is defined globally)
 	window.updateChessboardFromMatrix = function(matrix) {
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
@@ -769,77 +770,76 @@
 				square.appendChild(img);
 			}
 		}
-	}
+	};
 
-	// ====================
-	// Info Panel Section
-	// ====================
+	// --------------------
+	// Info Panel Section (to the right of the chessboard)
+	// --------------------
 	let infoContainer = document.createElement("div");
 	infoContainer.id = "infoContainer";
-	infoContainer.style.width = "50%";  // Occupies the right half of mainContainer
-	infoContainer.style.height = "100%";
+	infoContainer.style.width = "50%";   // Occupies the right half of mainContainer
+	infoContainer.style.height = "172px";   // Match the chessboard height (500px)
 	infoContainer.style.display = "flex";
 	infoContainer.style.flexDirection = "column";
-	infoContainer.style.justifyContent = "space-evenly";  // Distribute 3 divs evenly
 	infoContainer.style.boxSizing = "border-box";
 	mainContainer.appendChild(infoContainer);
 
-	// Info Div 1: Last Move Display
-	let lastMoveDiv = document.createElement("div");
-	lastMoveDiv.id = "lastMoveDiv";
-	lastMoveDiv.style.height="33.33%";
-	lastMoveDiv.style.display = "flex";
-	lastMoveDiv.style.alignItems = "center";
-	lastMoveDiv.style.justifyContent = "center";
-	lastMoveDiv.style.background = "#2A2926";
-	lastMoveDiv.style.color = "white";
-	lastMoveDiv.style.fontSize = "16px";
-	lastMoveDiv.innerText = "Last Move: [move]";
-	infoContainer.appendChild(lastMoveDiv);
-
-	// Info Div 2: Move Type Display
+	// Create three equal rows for the info panel
+	// Row 1: Move Type
 	let moveTypeDiv = document.createElement("div");
 	moveTypeDiv.id = "moveTypeDiv";
-	moveTypeDiv.style.height="33.33%";
+	moveTypeDiv.style.flex = "1";
 	moveTypeDiv.style.display = "flex";
 	moveTypeDiv.style.alignItems = "center";
 	moveTypeDiv.style.justifyContent = "center";
 	moveTypeDiv.style.background = "#2A2926";
 	moveTypeDiv.style.color = "white";
 	moveTypeDiv.style.fontSize = "16px";
-	moveTypeDiv.innerText = "Move Type:";
+	moveTypeDiv.style.fontWeight = "bold";
+	moveTypeDiv.innerText = "Move Type: [Good/Blunder]";
 	infoContainer.appendChild(moveTypeDiv);
 
-	// Info Div 3: Composite Score Div (Half image, half score)
+	// Row 2: Image
+	let imageDiv = document.createElement("div");
+	imageDiv.id = "imageDiv";
+	imageDiv.style.flex = "1";
+	imageDiv.style.display = "flex";
+	imageDiv.style.alignItems = "center";
+	imageDiv.style.justifyContent = "center";
+	imageDiv.style.background = "#2A2926";
+	imageDiv.style.color = "white";
+	// For now we use a placeholder; later replace with an actual <img> element if needed.
+	imageDiv.innerText = "Img";
+	infoContainer.appendChild(imageDiv);
+
+	// Row 3: Score
 	let scoreDiv = document.createElement("div");
 	scoreDiv.id = "scoreDiv";
-	scoreDiv.style.height="33.33%";
+	scoreDiv.style.flex = "1";
 	scoreDiv.style.display = "flex";
+	scoreDiv.style.alignItems = "center";
+	scoreDiv.style.justifyContent = "center";
+	scoreDiv.style.fontSize = "16px";
+	scoreDiv.style.color = "white";
 	scoreDiv.style.background = "#2A2926";
-	scoreDiv.style.boxSizing = "border-box";
-
-	// Left half for an image
-	let scoreImageDiv = document.createElement("div");
-	scoreImageDiv.id = "scoreImageDiv";
-	scoreImageDiv.style.flex = "1";
-	scoreImageDiv.style.display = "flex";
-	scoreImageDiv.style.alignItems = "center";
-	scoreImageDiv.style.justifyContent = "center";
-	scoreImageDiv.style.borderRight = "1px solid #444"; // Optional divider
-	scoreImageDiv.innerText = "Img";  // Placeholder; later replace with an <img> element if needed
-	scoreDiv.appendChild(scoreImageDiv);
-
-	// Right half for the score text
-	let scoreTextDiv = document.createElement("div");
-	scoreTextDiv.id = "scoreTextDiv";
-	scoreTextDiv.style.flex = "1";
-	scoreTextDiv.style.display = "flex";
-	scoreTextDiv.style.alignItems = "center";
-	scoreTextDiv.style.justifyContent = "center";
-	scoreTextDiv.style.fontSize = "16px";
-	scoreTextDiv.innerText = "+0.2";  // Placeholder score
-	scoreDiv.appendChild(scoreTextDiv);
-
+	scoreDiv.innerText = "+0.2";
 	infoContainer.appendChild(scoreDiv);
+
+	// --------------------
+	// Bottom Section: Last Move Row (full width below the main container)
+	// --------------------
+	let lastMoveRow = document.createElement("div");
+	lastMoveRow.id = "lastMoveRow";
+	lastMoveRow.style.width = "100%";
+	lastMoveRow.style.height = "5%";    // Fixed height for the last move row
+	lastMoveRow.style.background = "#2A2926";
+	lastMoveRow.style.display = "flex";
+	lastMoveRow.style.alignItems = "center";
+	lastMoveRow.style.justifyContent = "center";
+	lastMoveRow.style.fontSize = "16px";
+	lastMoveRow.style.fontWeight = "bold";
+	lastMoveRow.style.color = "white";
+	lastMoveRow.innerText = "Last Move: [move]";
+	guiDiv.appendChild(lastMoveRow);
 
 })();
