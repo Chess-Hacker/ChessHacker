@@ -19,13 +19,11 @@ def launch_client_Key():
 	global Isdemo
 	selected_site = site_var.get()
 	selected_engine = engine_var.get()
-	selected_resolution = resolution_var.get()
 	user_input = text_input.get()
 	global token
 	token = user_input
 	print(f"Launching {selected_site} with {selected_engine} engine!")
 	print(f"User input:{user_input}")
-	print(f"Selected resolution: {selected_resolution}")
 
 	response = requests.get("https://chess-demo.mihneaspiridon.workers.dev/",
                         headers={
