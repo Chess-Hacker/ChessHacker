@@ -356,7 +356,7 @@
 	/// ROW 1-----------------------------------------------------------------
 	let rowDiv = document.createElement("div");
 	rowDiv.style.width = "100%"; 
-	rowDiv.style.height = "10%";
+	rowDiv.style.height = "6%";
 	rowDiv.style.background = "#2A2926";
 	rowDiv.style.display = "flex";
 	rowDiv.style.alignItems = "center";
@@ -565,7 +565,7 @@
 	// ROW 8-9-10-11 To display more settings and help ------------------------------------------------------------------------
 	let rowDiv1 = document.createElement("div");
 	rowDiv1.style.width = "100%"; 
-	rowDiv1.style.height = "10%";
+	rowDiv1.style.height = "6%";
 	rowDiv1.style.background = "#2A2926";
 	rowDiv1.style.display = "flex";
 	rowDiv1.style.alignItems = "center";
@@ -676,15 +676,10 @@
 	rowsContainer.appendChild(rowDiv2);
 
 
-	// ----------------------------------------------------------------------------------------------------------------------
-	contentContainer.appendChild(barColumn);
-	contentContainer.appendChild(rowsContainer);
-	guiDiv.appendChild(contentContainer);
-
 	// FEN Display ----------------------------------------------------------------------------------------------------------
 	let fenDisplay = document.createElement("div");
 	fenDisplay.style.width = "100%"; 
-	fenDisplay.style.height = "5%";
+	fenDisplay.style.height = "8%";
 	fenDisplay.style.background = "#2A2926";
 	fenDisplay.style.display = "";
 	fenDisplay.style.alignItems = "center";
@@ -704,7 +699,13 @@
 	FENTextArea.value = "FEN: (waiting for update)";
 
 	fenDisplay.appendChild(FENTextArea);
-	guiDiv.appendChild(fenDisplay);
+	rowsContainer.appendChild(fenDisplay);
+	//guiDiv.appendChild(fenDisplay);
+
+	// ----------------------------------------------------------------------------------------------------------------------
+	contentContainer.appendChild(barColumn);
+	contentContainer.appendChild(rowsContainer);
+	guiDiv.appendChild(contentContainer);
 	
 	// ====================================================
 	// Overall Container (GUI Div)
@@ -777,7 +778,7 @@
 	// --------------------
 	let infoContainer = document.createElement("div");
 	infoContainer.id = "infoContainer";
-	infoContainer.style.width = "50%";   // Occupies the right half of mainContainer
+	infoContainer.style.width = "90%";   // Occupies the right half of mainContainer
 	infoContainer.style.height = "172px";   // Match the chessboard height (500px)
 	infoContainer.style.display = "flex";
 	infoContainer.style.flexDirection = "column";
@@ -794,9 +795,7 @@
 	moveTypeDiv.style.justifyContent = "center";
 	moveTypeDiv.style.background = "#2A2926";
 	moveTypeDiv.style.color = "white";
-	moveTypeDiv.style.fontSize = "16px";
-	moveTypeDiv.style.fontWeight = "bold";
-	moveTypeDiv.innerText = "Move Type: [Good/Blunder]";
+	moveTypeDiv.innerText = "Move Type: ";
 	infoContainer.appendChild(moveTypeDiv);
 
 	// Row 2: Image
@@ -808,7 +807,6 @@
 	imageDiv.style.justifyContent = "center";
 	imageDiv.style.background = "#2A2926";
 	imageDiv.style.color = "white";
-	// For now we use a placeholder; later replace with an actual <img> element if needed.
 	imageDiv.innerText = "Img";
 	infoContainer.appendChild(imageDiv);
 
@@ -831,15 +829,14 @@
 	let lastMoveRow = document.createElement("div");
 	lastMoveRow.id = "lastMoveRow";
 	lastMoveRow.style.width = "100%";
-	lastMoveRow.style.height = "5%";    // Fixed height for the last move row
+	lastMoveRow.style.height = "5%";
 	lastMoveRow.style.background = "#2A2926";
 	lastMoveRow.style.display = "flex";
 	lastMoveRow.style.alignItems = "center";
 	lastMoveRow.style.justifyContent = "center";
 	lastMoveRow.style.fontSize = "16px";
-	lastMoveRow.style.fontWeight = "bold";
 	lastMoveRow.style.color = "white";
-	lastMoveRow.innerText = "Last Move: [move]";
+	lastMoveRow.innerText = "Last Move: ";
 	guiDiv.appendChild(lastMoveRow);
 
 })();
