@@ -326,7 +326,7 @@ async def safe_evaluate(page, script):
             else:
                 raise
 
-async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv2:str,pv3:str):
+async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv2:str,pv3:str,deltascore:float,Moves:int):
     global _page
     if not _page:
         print("⚠️ No page reference yet. Can't update GUI.")
@@ -353,6 +353,11 @@ async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv
     (function() {{
 		if (typeof updatePVS === 'function') {{
 			updatePVS("PV1:{pv1}","PV2:{pv2}","PV3:{pv3}");
+		}}
+    }})();
+    (function() {{
+		if (typeof updateDeltaScore === 'function') {{
+			updateDeltaScore("{deltascore}","{Moves}");
 		}}
 	}})();
     """

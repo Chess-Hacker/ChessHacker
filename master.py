@@ -28,6 +28,7 @@ Teacher = False
 NoBlunder = False
 Engine = True
 # === GAME STATE VARIABLES ===
+lastscore=0
 Didmove = False
 WhoNext = "white"
 Moves = 0
@@ -198,6 +199,7 @@ def isStartBoard(Board):
         return False
 
 def DoMove():
+    global lastscore
     initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
     if initial_fen =="8/8/8/8/8/8/8/8 w - - 0 1":
         return 0
@@ -207,9 +209,10 @@ def DoMove():
     #print(initial_fen)
     #print(score)
     #print(pv1,pv2,pv3)
-
+    print(Moves)
+    deltascore = score-lastscore
     future = asyncio.run_coroutine_threadsafe(
-        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3),
+        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves),
         puppet._loop
     )
     future.result()
@@ -231,6 +234,7 @@ def DoMove():
         best_move = stockfishapi.get_time_move(stockfish, Slider1)
         puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
     #print(best_move)
+    lastscore=score
 
 def reset():
     global _running,StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,Teacher,NoBlunder,Engine,Didmove,WhoNext,Moves,Board
