@@ -841,61 +841,86 @@
 	scoreDiv.innerText = "Score: 0";
 	infoContainer.appendChild(scoreDiv);
 
-	window.updateDeltaScore = function(deltascore,Moves) {
+	window.updateDeltaScore = function(deltascore,Moves,score,white) {
+		console.log(white)
 		deltascore= parseFloat(deltascore.replace(",", "."));
 		deltascore = Math.round(deltascore*100)/100;
 		if(Moves%2==0)
 			deltascore=-deltascore;
-
-		scoreDiv.innerText = "Score:"+deltascore;
+		console.log(deltascore)
+		if((score>100 || score<-100) || deltascore>100){
+			scoreDiv.innerText = "Score:ForceMate";
+		}
+		else
+		if(deltascore<-100){
+			scoreDiv.innerText = "Score:Lost ForceMate";
+		}
+		else{
+			scoreDiv.innerText = "Score:"+deltascore;
+		}
+		if((score>100 || score<-100)){
+			moveTypeDiv.innerText="Move Type:Best";
+			img1.src = `data:image/png;base64,${base64Images["3"]}`;
+			return;
+		}else
 		if(Moves<4){
 			moveTypeDiv.innerText="Move Type:Book";
 			img1.src = `data:image/png;base64,${base64Images["6"]}`;
+			return;
 		}else
-		if(deltascore<5 && deltascore>3){
+		if(deltascore>=0.25 && deltascore<10){
 			///BRILLIANT
 			moveTypeDiv.innerText="Move Type:Brilliant";
 			img1.src = `data:image/png;base64,${base64Images["1"]}`;
+			return;
 		}else
-		if(deltascore<3 && deltascore>2){
+		if(deltascore>=0 && deltascore<0.25){
 			///GREAT MOVE
 			moveTypeDiv.innerText="Move Type:Great";
 			img1.src = `data:image/png;base64,${base64Images["2"]}`;
+			return;
 		}else
-		if((deltascore<2 && deltascore>1) || deltascore>10){
+		if((deltascore>=-0.10 && deltascore<0) || deltascore>10){
 			///BEST MOVE
 			moveTypeDiv.innerText="Move Type:Best";
 			img1.src = `data:image/png;base64,${base64Images["3"]}`;
+			return;
 		}else
-		if(deltascore<1 && deltascore>0.5){
+		if(deltascore>=-0.25 && deltascore<0.10){
 			///EXCELLENT
 			moveTypeDiv.innerText="Move Type:Excellent";
 			img1.src = `data:image/png;base64,${base64Images["4"]}`;
+			return;
 		}else
-		if(deltascore<0.5 && deltascore>0){
+		if(deltascore>=-0.50 && deltascore<-0.25){
 			///GOOD
 			moveTypeDiv.innerText="Move Type:Good";
 			img1.src = `data:image/png;base64,${base64Images["5"]}`;
+			return;
 		}else
-		if(deltascore<0 && deltascore>-1){
+		if(deltascore>=-1 && deltascore>-0.5){
+			///INACURACY
 			moveTypeDiv.innerText="Move Type:Inaccuracy";
 			img1.src = `data:image/png;base64,${base64Images["7"]}`;
-			///INACURACY
+			return;
 		}else
-		if(deltascore<-1 && deltascore>-2){
+		if(deltascore>=-1.5 && deltascore<-1){
 			///MISTAKE
 			moveTypeDiv.innerText="Move Type:Mistake";
 			img1.src = `data:image/png;base64,${base64Images["8"]}`;
+			return;
 		}else
-		if(deltascore<-2 && deltascore>-5){
+		if(deltascore>=-2.5 && deltascore<-1.5){
 			///MISS
 			moveTypeDiv.innerText="Move Type:Miss";
 			img1.src = `data:image/png;base64,${base64Images["9"]}`;
+			return;
 		}else
-		if(deltascore<-10){
+		if(deltascore>=-10 && deltascore<-2.5){
 			///BLUNDER
 			moveTypeDiv.innerText="Move Type:Blunder";
 			img1.src = `data:image/png;base64,${base64Images["10"]}`;
+			return;
 		}
 	};
 

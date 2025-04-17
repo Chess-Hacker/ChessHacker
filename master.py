@@ -199,7 +199,7 @@ def isStartBoard(Board):
         return False
 
 def DoMove():
-    global lastscore
+    global lastscore,GuiCheckbox1
     initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
     if initial_fen =="8/8/8/8/8/8/8/8 w - - 0 1":
         return 0
@@ -209,10 +209,9 @@ def DoMove():
     #print(initial_fen)
     #print(score)
     #print(pv1,pv2,pv3)
-    print(Moves)
     deltascore = score-lastscore
     future = asyncio.run_coroutine_threadsafe(
-        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves),
+        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves,GuiCheckbox1),
         puppet._loop
     )
     future.result()
