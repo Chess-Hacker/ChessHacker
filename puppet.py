@@ -382,7 +382,7 @@ async def reload_gui(StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthChe
         const btn = document.getElementById("StartButton");
         if ("{StartButton}"=="True") {{
             btn.innerText = "STOP";
-            btn.style.background = "#1D1C1A";
+            btn.style.background = "#1d1c1a";
         }} else {{
             btn.innerText = "START";
             btn.style.background = "#2A2926";
@@ -419,6 +419,13 @@ async def reload_gui(StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthChe
         }} else {{
             SkillCheckBox.checked=false;
         }}
+
+        const SliderVal0=document.getElementById("SliderVal0");
+        SliderVal0.innerText = "Depth: {Slider0}"
+        const SliderVal1=document.getElementById("SliderVal1");
+        SliderVal1.innerText = "Time: {Slider1}" 
+        const SliderVal2=document.getElementById("SliderVal2");
+        SliderVal2.innerText = "Rating: {Slider2}"
 
         const ColorSelector0 = document.getElementById("ColorSelector0");
         ColorSelector0.value="{ColorSelector0}"

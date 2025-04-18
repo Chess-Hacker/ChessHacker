@@ -524,6 +524,7 @@
 		row.style.padding = "5px";
 	
 		let settingLabel = document.createElement("span");
+		settingLabel.id = `SliderVal${[i]}`
 		settingLabel.style.flexBasis = "25%";
 		settingLabel.style.fontSize = "1em";
 		let initialValue = i === 2 ? "1320" : "1";
