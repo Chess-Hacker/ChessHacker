@@ -4,8 +4,8 @@ import sys
 import threading
 import requests
 
-# Demo runs for 5 minutes (300_000 ms); adjust as you like:
-DEMO_DURATION_MS = 60 * 60 * 1000
+# Demo runs for 3 minutes (300_000 ms); adjust as you like:
+DEMO_DURATION_MS = 3 * 60 * 1000
 
 token = None
 Isdemo = True
@@ -109,7 +109,7 @@ text_input.grid(row=4, column=1, pady=10)
 launch_button = tk.Button(frame, text="Launch", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
 launch_button.grid(row=5, column=0, columnspan=1, pady=20, padx=10)
 launch_button.config(command=launch_client_Key)
-launch_button1 = tk.Button(frame, text="Demo", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
+launch_button1 = tk.Button(frame, text="Demo (3 minutes)", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
 launch_button1.grid(row=5, column=1, columnspan=1, pady=20, padx=10)
 launch_button1.config(command=launch_client_Demo)
 
