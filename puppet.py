@@ -12,7 +12,7 @@ _running = True
 
 def parse_chessboard(html_content):
 	piece_pattern = re.findall(
-		r'<div class="piece (?:square-(\d{2}) )?(\w{2})(?: square-(\d{2}))?"',
+		r'<div class="piece (?:square-(\d{2}) )?(\w{2})(?: square-(\d{2}))?[" ]',
 		html_content
 	)
 
@@ -295,7 +295,6 @@ async def on_gui_change(change_data: dict):
     with open("gui.txt", "a", encoding="utf-8") as f:
         f.write(log_entry)
 
-
 _on_gui_change_registered = False
 
 async def inject_gui(page):
@@ -309,6 +308,9 @@ async def inject_gui(page):
 
     with open("gui.js", "r", encoding="utf-8") as f:
         js_code = f.read()
+    
+    with open("gui.txt", "a") as f:
+        f.write("{\'id\':\'Reload\',\'value\':\'Reload\'}")
 
     await page.evaluate(js_code)
     print("✅ GUI code injected successfully.")
@@ -361,6 +363,86 @@ async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv
 		}}
 	}})();
     """
+    await safe_evaluate(_page, script)
+
+async def reload_gui(StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,NoBlunder,Engine):
+    global _page
+    if not _page:
+        print("⚠️ No page reference yet. Can't update GUI.")
+        return
+
+    script = f"""
+    (function() {{
+        const btn = document.getElementById("StartButton");
+        if ("{StartButton}"=="True") {{
+            btn.innerText = "STOP";
+            btn.style.background = "#1D1C1A";
+        }} else {{
+            btn.innerText = "START";
+            btn.style.background = "#2A2926";
+        }}
+
+        const GuiCheckbox1= document.getElementById("GuiCheckbox1");
+        if("{GuiCheckbox1}"=="True") {{
+            GuiCheckbox1.checked=true;
+        }} else {{
+            GuiCheckbox1.checked=false;
+        }}
+        const GuiCheckbox2= document.getElementById("GuiCheckbox2");
+        if("{GuiCheckbox2}"=="True") {{
+            GuiCheckbox2.checked=true;
+        }} else {{
+            GuiCheckbox2.checked=false;
+        }}
+
+        const TimeCheckBox=document.getElementById("TimeCheckBox");
+        if("{TimeCheckBox}"=="True"){{
+            TimeCheckBox.checked=true;
+        }} else {{
+            TimeCheckBox.checked=false;
+        }}
+        const DepthCheckBox=document.getElementById("DepthCheckBox");
+        if("{DepthCheckBox}"=="True"){{
+            DepthCheckBox.checked=true;
+        }} else {{
+            DepthCheckBox.checked=false;
+        }}
+        const SkillCheckBox=document.getElementById("SkillCheckBox");
+        if("{SkillCheckBox}"=="True"){{
+            SkillCheckBox.checked=true;
+        }} else {{
+            SkillCheckBox.checked=false;
+        }}
+
+        const ColorSelector0 = document.getElementById("ColorSelector0");
+        ColorSelector0.value="{ColorSelector0}"
+        const ColorSelector1 = document.getElementById("ColorSelector1");
+        ColorSelector1.value="{ColorSelector1}"
+        const ColorSelector2 = document.getElementById("ColorSelector2");
+        ColorSelector2.value="{ColorSelector2}"
+
+        const Slider0 = document.getElementById("Slider0");
+        Slider0.value = "{Slider0}"
+        const Slider1 = document.getElementById("Slider1");
+        Slider1.value = "{Slider1}"
+        const Slider2 = document.getElementById("Slider2");
+        Slider2.value = "{Slider2}"
+
+        const Engine = document.getElementById("Engine");
+        if("{Engine}"=="True"){{
+            Engine.checked=true;
+        }} else {{
+            Engine.checked=false;
+        }}
+        const NoBlunder = document.getElementById("NoBlunder");
+        if("{NoBlunder}"=="True"){{
+            NoBlunder.checked=true;
+        }} else {{
+            NoBlunder.checked=false;
+        }}
+    }})();
+    """
+
     await safe_evaluate(_page, script)
 
 def handle_browser_close():

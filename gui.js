@@ -153,6 +153,10 @@
 	row.style.justifyContent = "center";
 	guiDiv.appendChild(row);
 
+	// track state
+	let isRunning = false;
+
+	// create the button
 	let button1 = document.createElement("button");
 	button1.id = "StartButton";
 	button1.innerText = "START";
@@ -165,28 +169,41 @@
 	button1.style.alignItems = "center";
 	button1.style.justifyContent = "center";
 	button1.style.textDecoration = "none";
-	button1.style.background = "#262522";
+	button1.style.background = "#262522";   // default
 	button1.style.fontSize = "16px";
 	button1.style.cursor = "pointer";
 
+	// hover only when not running
 	button1.addEventListener("mouseover", () => {
-		button1.style.background = "#2A2926";
+		if (!isRunning) button1.style.background = "#2A2926";
 	});
 	button1.addEventListener("mouseout", () => {
-		button1.style.background = "#262522";
+		if (!isRunning) button1.style.background = "#262522";
 	});
 
+	// mousedown/up key styling (always dark)
 	button1.addEventListener("mousedown", () => {
 		button1.style.background = "#2A2926";
 	});
 	button1.addEventListener("mouseup", () => {
-		button1.style.background = "#2A2926";
+		// if running, keep it darker; otherwise mimic hover
+		button1.style.background = isRunning ? "#1D1C1A" : "#2A2926";
 	});
 
 	button1.onclick = () => {
+		isRunning = !isRunning; // toggle
+
+		if (isRunning) {
+			button1.innerText = "STOP";
+			button1.style.background = "#1D1C1A";  // even darker for “pressed” look
+		} else {
+			button1.innerText = "START";
+			button1.style.background = "#2A2926";  // hover‐state color
+		}
+
 		window.onGuiChange({
 			id: button1.id,
-			value: "StartClicked"
+			value: isRunning ? "StartClicked" : "StopClicked"
 		});
 	};
 
@@ -287,8 +304,8 @@
 
 	// Bar fill (white overlay)
 	let barFill = document.createElement("div");
+	barFill.id = "BarPerc"
 	barFill.style.width = "100%";
-	// Start at 50% fill (you can adjust as needed)
 	barFill.style.height = "50%";
 	barFill.style.background = "white";
 	barFill.style.transition = "height 1s ease-in-out";
@@ -593,49 +610,52 @@
 		row.style.justifyContent = "space-between";
 		row.style.width = "100%";
 		row.style.height = "8%";
-		if(i==1)
-			row.style.background = "#2A2926";
-		else
-			row.style.background = "#262522";
+		row.style.background = (i === 1 ? "#2A2926" : "#262522");
 		row.style.padding = "5px";
-
+	
 		let label1 = document.createElement("label");
-		let item1 = document.createElement("input");
-		
 		label1.style.display = "flex";
 		label1.style.width = "100%";
 		label1.style.height = "3.9%";
-		if(i==0 || i==2)
-			label1.style.background = "#262522";
-		else
-			label1.style.background = "#2A2926";
+		label1.style.background = (i === 1 ? "#2A2926" : "#262522");
 		label1.style.alignItems = "center";
 		label1.style.justifyContent = "center";
-		
-		if (i === 1) {
-			label1.appendChild(document.createTextNode("Show Blunders"));
-			item1.id = "NoBlunder";
-		} else if (i === 0) {
-			label1.appendChild(document.createTextNode("Show Engine Moves"));
-			item1.id = "Teacher";
-		}
-		
+	
+		let item1 = document.createElement("input");
 		item1.type = "checkbox";
 		item1.classList.add("settingsCheckbox");
 	
 		if (i === 0) {
+			label1.appendChild(document.createTextNode("Display Engine Moves"));
+			item1.id = "Engine";
 			item1.checked = true;
+		} else {
+			label1.appendChild(document.createTextNode("Display Anti-Blunders"));
+			item1.id = "NoBlunder";
+			/// DISABLE ANTI BLUNDER FOR NOW
+			item1.disabled = true;
+			row.style.background="#111111";
+			label1.style.background="#111111";
+			label1.style.color="#999999";
 		}
-		
+	
+		item1.addEventListener("change", function() {
+			window.onGuiChange({
+			  id: this.id,
+			  value: this.checked
+			});
+		});
+	
 		label1.appendChild(item1);
 		row.appendChild(label1);
 		rowsContainer.appendChild(row);
 	}
+
 	/// HELP BUTTON -----------------------------------------------------------------------------------
 	let rowDiv2 = document.createElement("div");
 	rowDiv2.style.width = "100%";
 	rowDiv2.style.height = "8%";
-	rowDiv2.style.background = "#2A2926";
+	rowDiv2.style.background = "#262522";
 	rowDiv2.style.display = "flex";
 	rowDiv2.style.alignItems = "center";
 	rowDiv2.style.justifyContent = "center";
@@ -804,7 +824,7 @@
 	moveTypeDiv.style.display = "flex";
 	moveTypeDiv.style.alignItems = "center";
 	moveTypeDiv.style.justifyContent = "center";
-	moveTypeDiv.style.background = "#2A2926";
+	moveTypeDiv.style.background = "#262522";
 	moveTypeDiv.style.color = "white";
 	moveTypeDiv.innerText = "Move Type: Start";
 	infoContainer.appendChild(moveTypeDiv);
@@ -837,7 +857,7 @@
 	scoreDiv.style.justifyContent = "center";
 	scoreDiv.style.fontSize = "16px";
 	scoreDiv.style.color = "white";
-	scoreDiv.style.background = "#2A2926";
+	scoreDiv.style.background = "#262522";
 	scoreDiv.innerText = "Score: 0";
 	infoContainer.appendChild(scoreDiv);
 

@@ -11,8 +11,8 @@ import win32con
 
 
 # === MASTER VARIABLES ===
-_running=True
-StartButton = False
+_running=False
+StartButton = False 
 GuiCheckbox1 = True
 GuiCheckbox2 = False
 TimeCheckBox = False
@@ -24,7 +24,6 @@ ColorSelector1 = "#00FF00"
 Slider1 = 1
 ColorSelector2 = "#0000FF" 
 Slider2 = 1320
-Teacher = False
 NoBlunder = False
 Engine = True
 # === GAME STATE VARIABLES ===
@@ -62,6 +61,9 @@ def update_variables():
 
                     id_name = entry["id"]
                     value = entry["value"]
+
+                    if id_name == "Reload":
+                        ReloadGui()
 
                     if id_name == "StartButton":
                         StartButton = not StartButton
@@ -108,20 +110,11 @@ def update_variables():
                         Slider2 = int(value)
                         print(Slider2)
 
-                    elif id_name == "Teacher":
-                        Teacher = bool(value)
-                        NoBlunder = False
-                        Engine = False
-
                     elif id_name == "NoBlunder":
                         NoBlunder = bool(value)
-                        Teacher = False
-                        Engine = False
 
                     elif id_name == "Engine":
                         Engine = bool(value)
-                        Teacher = False
-                        NoBlunder = False
 
                 except json.JSONDecodeError:
                     print(f"Skipping invalid line: {line}")
@@ -161,8 +154,9 @@ def update_chessboard():
             Restart = isStartBoard(Board)
             if Restart:
                 parserFEN.ResetCastling()
-
-            DoMove()
+            # Pornesc mutari daca start este on
+            if StartButton:
+                DoMove()
         return Didmove, WhoNext,Moves ,Board
 
     except FileNotFoundError:
@@ -198,6 +192,16 @@ def isStartBoard(Board):
     else:
         return False
 
+def ReloadGui():
+    global StartButton, GuiCheckbox1, GuiCheckbox2, TimeCheckBox, DepthCheckBox
+    global SkillCheckBox, ColorSelector0, Slider0,ColorSelector1, Slider1,ColorSelector2, Slider2, Teacher, NoBlunder, Engine
+    print(StartButton)
+    future = asyncio.run_coroutine_threadsafe(
+        puppet.reload_gui(StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,NoBlunder,Engine),
+        puppet._loop
+    )
+    future.result()
+
 def DoMove():
     global lastscore,GuiCheckbox1
     initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
@@ -206,9 +210,8 @@ def DoMove():
     score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
     stockfishapi.set_position_fen(stockfish, initial_fen)
 
-    #print(initial_fen)
-    #print(score)
-    #print(pv1,pv2,pv3)
+    print(initial_fen)
+    print(score)
     deltascore = score-lastscore
     future = asyncio.run_coroutine_threadsafe(
         puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves,GuiCheckbox1),
@@ -218,21 +221,21 @@ def DoMove():
 
     best_move = None
     if(SkillCheckBox==True):
-        #print("Skill")
         stockfishapi.set_elo_rating(stockfish,Slider2)
         best_move = stockfishapi.get_depth_move(stockfish, 15)
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2,1)
+        if Engine:
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector2,1)
     else:
         stockfishapi.reset_elo_rating(stockfish)
     if(DepthCheckBox==True):
-        #print("Depth")
         best_move = stockfishapi.get_depth_move(stockfish, Slider0)
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0,1)
+        if Engine:
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector0,1)
     if(TimeCheckBox==True):
-        #print("timeCheck")
         best_move = stockfishapi.get_time_move(stockfish, Slider1)
-        puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
-    #print(best_move)
+        if Engine:
+            puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
+    print(best_move)
     lastscore=score
 
 def reset():
@@ -244,11 +247,11 @@ def reset():
     TimeCheckBox = False
     DepthCheckBox = True
     SkillCheckBox = False
-    ColorSelector0 = "#FF0000" 
+    ColorSelector0 = "#FF0000"
     Slider0 = 1 
-    ColorSelector1 = "#00FF00" 
+    ColorSelector1 = "#00FF00"
     Slider1 = 1
-    ColorSelector2 = "#0000FF" 
+    ColorSelector2 = "#0000FF"
     Slider2 = 1320
     Teacher = False
     NoBlunder = False

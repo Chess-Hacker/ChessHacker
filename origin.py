@@ -4,8 +4,12 @@ import sys
 import threading
 import requests
 
+# Demo runs for 5 minutes (300_000 ms); adjust as you like:
+DEMO_DURATION_MS = 60 * 60 * 1000
+
 token = None
-Isdemo=True
+Isdemo = True
+_demo_timer_id = None  
 
 def on_close():
     print("Closing the app... Performing cleanup.")
@@ -41,12 +45,17 @@ def launch_client_Key():
 		master_thread.start()
 
 def launch_client_Demo():
+	global _demo_timer_id
 	selected_site = site_var.get()
 	selected_engine = engine_var.get()
 	user_input = text_input.get()
 	import master
 	master_thread = threading.Thread(target=master.main, daemon=True)
 	master_thread.start()
+
+	if _demo_timer_id is not None:
+		root.after_cancel(_demo_timer_id)
+	_demo_timer_id = root.after(DEMO_DURATION_MS, on_close)
 
 root = tk.Tk()
 root.protocol("WM_DELETE_WINDOW", on_close)
