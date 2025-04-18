@@ -960,4 +960,8 @@
 	lastMoveRow.innerText = "Last Move: ";
 	guiDiv.appendChild(lastMoveRow);
 
+	window.updatemovecode = function(movecode) {
+		lastMoveRow.innerText = "Last Move: "+movecode;
+	};
+
 })();

@@ -80,8 +80,9 @@ async def track_moves():
                 handle_browser_close()
             #browser.on("close", handle_browser_close)
             content = await _page.content()
-            curr_board = parse_chessboard(content)
             total_moves, last_move_color = parse_move_list(content)
+            content = await _page.content()
+            curr_board = parse_chessboard(content)
             Moved = False
             
             if total_moves != prev_total_moves:
@@ -328,7 +329,7 @@ async def safe_evaluate(page, script):
             else:
                 raise
 
-async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv2:str,pv3:str,deltascore:float,Moves:int,white:bool):
+async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv2:str,pv3:str,deltascore:float,Moves:int,white:bool,movecode:str):
     global _page
     if not _page:
         print("⚠️ No page reference yet. Can't update GUI.")
@@ -360,6 +361,11 @@ async def update_gui(new_text: str, matrix,score:float,mate_score:str,pv1:str,pv
     (function() {{
 		if (typeof updateDeltaScore === 'function') {{
 			updateDeltaScore("{deltascore}","{Moves}","{score}","{white}");
+		}}
+	}})();
+    (function() {{
+		if (typeof updatemovecode === 'function') {{
+			updatemovecode("{movecode}");
 		}}
 	}})();
     """

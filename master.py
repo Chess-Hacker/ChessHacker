@@ -27,6 +27,7 @@ Slider2 = 1320
 NoBlunder = False
 Engine = True
 # === GAME STATE VARIABLES ===
+lastBoard = None
 lastscore=0
 Didmove = False
 WhoNext = "white"
@@ -122,7 +123,6 @@ def update_variables():
         except Exception as e:
             print(f"Error reading gui.txt: {e}")
 
-
 def read_file_contents(filepath):
     try:
         with open(filepath, "r") as f:
@@ -202,19 +202,50 @@ def ReloadGui():
     )
     future.result()
 
+def detect_move_simple(lastBoard, Board):
+    tolet = {
+        0: "a",
+        1: "b",
+        2: "c",
+        3: "d",
+        4: "e",
+        5: "f",
+        6: "g",
+        7: "h"
+    }
+    piesa = ""
+    ip,jp,ia,ja = None,None,None,None
+    rez=""
+    for i in range(0,8,1):
+        for j in range(0,8,1):
+            if Board[i][j]!=lastBoard[i][j]:
+                if (lastBoard[i][j]!='.' and Board[i][j]=='.'):
+                    ip=i
+                    jp=j
+                    piesa=lastBoard[i][j]
+                else:
+                    ia=i
+                    ja=j
+    if ip!=None and jp!=None and ia!=None and ja!=None:
+        rez=rez+piesa+tolet[jp]+str(8-ip)+tolet[ja]+str(8-ia)
+    return rez
+
 def DoMove():
-    global lastscore,GuiCheckbox1
+    global lastscore,GuiCheckbox1,lastBoard
     initial_fen = parserFEN.matrix_to_fen(Board, Moves, WhoNext,GuiCheckbox1)
     if initial_fen =="8/8/8/8/8/8/8/8 w - - 0 1":
         return 0
     score,mate_score,pv1,pv2,pv3 = stockfishapi.get_stockfish_score(stockfish,15,initial_fen)
     stockfishapi.set_position_fen(stockfish, initial_fen)
+    movecode="None"
+    if lastBoard!=None:
+        movecode = detect_move_simple(lastBoard,Board)
 
     print(initial_fen)
     print(score)
     deltascore = score-lastscore
     future = asyncio.run_coroutine_threadsafe(
-        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves,GuiCheckbox1),
+        puppet.update_gui(initial_fen,Board,score,mate_score,pv1,pv2,pv3,deltascore,Moves,GuiCheckbox1,movecode),
         puppet._loop
     )
     future.result()
@@ -237,6 +268,7 @@ def DoMove():
             puppet.show_best_move_sync(best_move,GuiCheckbox1,ColorSelector1,1)
     print(best_move)
     lastscore=score
+    lastBoard=Board
 
 def reset():
     global _running,StartButton,GuiCheckbox1,GuiCheckbox2,TimeCheckBox,DepthCheckBox,SkillCheckBox,ColorSelector0,Slider0,ColorSelector1,Slider1,ColorSelector2,Slider2,Teacher,NoBlunder,Engine,Didmove,WhoNext,Moves,Board
@@ -253,7 +285,6 @@ def reset():
     Slider1 = 1
     ColorSelector2 = "#0000FF"
     Slider2 = 1320
-    Teacher = False
     NoBlunder = False
     Engine = True
     # === GAME STATE VARIABLES ===
@@ -261,9 +292,9 @@ def reset():
     WhoNext = "white"
     Moves = 0
     Board = None
+    lastBoard = None
 
 def main():
-    
     parserFEN.ResetCastling()
     reset()
 
