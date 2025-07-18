@@ -664,7 +664,7 @@
 
 	// Create the <a> element
 	let helpLink = document.createElement("a");
-	helpLink.href = "https://your-help-link.com"; // 🔗 replace with your actual URL
+	helpLink.href = "https://chess-hacker.github.io/posts/guide";
 	helpLink.target = "_blank";
 	helpLink.style.textDecoration = "none";
 	helpLink.style.color = "white";

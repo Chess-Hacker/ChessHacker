@@ -4,63 +4,22 @@ import sys
 import threading
 import requests
 
-# Demo runs for 3 minutes (300_000 ms); adjust as you like:
-DEMO_DURATION_MS = 3 * 60 * 1000
-
-token = None
-Isdemo = True
-_demo_timer_id = None  
-
 def on_close():
     print("Closing the app... Performing cleanup.")
-    global token,Isdemo
-    if Isdemo==False:
-        response = requests.get("https://chess-demo.mihneaspiridon.workers.dev/",headers={"Action": "Release","Token": f"{token}"})
-        print(response.status_code)
     root.after(50, root.destroy)
 
-def launch_client_Key():
-	global Isdemo
+def launch_client():
 	selected_site = site_var.get()
 	selected_engine = engine_var.get()
-	user_input = text_input.get()
-	global token
-	token = user_input
-	print(f"Launching {selected_site} with {selected_engine} engine!")
-	print(f"User input:{user_input}")
-
-	response = requests.get("https://chess-demo.mihneaspiridon.workers.dev/",
-                        headers={
-                            "Action": "Bind",
-                            "Token": f"{token}"
-                        })
-	print(response.status_code)
-	if response.status_code==200:
-		Isdemo=False
-		text_input.config(state="readonly")
-		with open("token.txt", "w") as f:
-			f.write(f"{token}\n")
-		import master
-		master_thread = threading.Thread(target=master.main, daemon=True)
-		master_thread.start()
-
-def launch_client_Demo():
-	global _demo_timer_id
-	selected_site = site_var.get()
-	selected_engine = engine_var.get()
-	user_input = text_input.get()
+	
 	import master
 	master_thread = threading.Thread(target=master.main, daemon=True)
 	master_thread.start()
 
-	if _demo_timer_id is not None:
-		root.after_cancel(_demo_timer_id)
-	_demo_timer_id = root.after(DEMO_DURATION_MS, on_close)
-
 root = tk.Tk()
 root.protocol("WM_DELETE_WINDOW", on_close)
 root.title("Chess Hacker Launcher")
-root.geometry("620x470")
+root.geometry("510x470")
 root.resizable(False, False)
 root.config(bg="#f7f7f7")
 root.iconbitmap("Media/icon.ico")
@@ -98,20 +57,10 @@ browser_options = ["Chromium"]#, "Lc0", "Komodo"
 browser_menu = ttk.Combobox(frame, textvariable=browser_var, values=browser_options, state="readonly", font=("Helvetica", 12), width=20)
 browser_menu.grid(row=3, column=1, pady=10)
 
-# Text input area
-text_label = tk.Label(frame, text="Enter key:", font=("Helvetica", 14), bg="#f7f7f7")
-text_label.grid(row=4, column=0, sticky="w", pady=5)
-
-text_input = tk.Entry(frame, font=("Helvetica", 12), width=22, bd=2, relief="solid")
-text_input.grid(row=4, column=1, pady=10)
-
 # Launch button
-launch_button = tk.Button(frame, text="Launch", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button.grid(row=5, column=0, columnspan=1, pady=20, padx=10)
-launch_button.config(command=launch_client_Key)
-launch_button1 = tk.Button(frame, text="Demo (3 minutes)", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
-launch_button1.grid(row=5, column=1, columnspan=1, pady=20, padx=10)
-launch_button1.config(command=launch_client_Demo)
+launch_button1 = tk.Button(frame, text="LAUNCH", font=("Helvetica", 14, "bold"), bg="black", fg="white", width=20, height=2, relief="flat", bd=0)
+launch_button1.grid(row=5, column=0, columnspan=2, pady=20, padx=10)
+launch_button1.config(command=launch_client)
 
 # Footer
 footer_label = tk.Label(root, text="Chess Hacker - Maxwell's Demons", font=("Helvetica", 10), fg="#888888", bg="#f7f7f7")
